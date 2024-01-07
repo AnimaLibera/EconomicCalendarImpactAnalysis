@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 import requests
 import os
 
-class DataProvider:
+class Provider:
 
     def __init__(self):
           self.environment()
