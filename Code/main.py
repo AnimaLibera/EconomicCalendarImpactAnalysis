@@ -2,8 +2,8 @@ import provider as pd
 import analyst as al
 import json
 
-start_date = "2023-01-01"
-end_date = "2023-01-06"
+start_date = "2024-01-01"
+end_date = "2024-01-07"
 #provider = pd.Provider()
 #fx_prices = provider.foreign_exchange_rates(start_date, end_date)
 #print(fx_prices)

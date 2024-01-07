@@ -61,6 +61,8 @@ class Analyst:
         dates = []
         records = []
 
+        #print(self.fx_prices)
+
         for element in self.raw_economic_calendar:
             if element["impact"] == "High" and element["country"] == country:
                 datetime = pd.Timestamp(element["date"])
@@ -69,12 +71,19 @@ class Analyst:
                 actual = element["actual"]
                 deviation = self.calculate_deviation(expectation, actual)
                 price_now = self.get_fx_price(datetime)
+                price_1min = self.get_fx_price(datetime + pd.Timedelta(minutes=1))
+                price_5min = self.get_fx_price(datetime + pd.Timedelta(minutes=5))
+                price_10min = self.get_fx_price(datetime + pd.Timedelta(minutes=10))
+                price_30min = self.get_fx_price(datetime + pd.Timedelta(minutes=30))
+                first_impact = self.calculate_impact(price_1min, price_5min)
+                second_impact = self.calculate_impact(price_1min, price_10min)
+                third_impact = self.calculate_impact(price_1min, price_30min)
 
-                record = [event, expectation, actual, deviation, price_now]
+                record = [event, expectation, actual, deviation, price_now, price_1min, price_5min, first_impact, second_impact, third_impact]
                 dates.append(datetime)
                 records.append(record)
         
-        frame = pd.DataFrame(data = records, index=dates, columns=["Event", "Expectation", "Actual", "Deviation", "Price Now"])
+        frame = pd.DataFrame(data = records, index=dates, columns=["Event", "Expectation", "Actual", "Deviation", "Price Now", "Price 1Min", "Price 5Min", "First Impact", "Second Impact", "Third Impact"])
 
         return frame
     
@@ -93,3 +102,11 @@ class Analyst:
             return self.fx_prices[datetime]
         else:
             return None
+
+    def calculate_impact(self, old_price, new_price):
+        """Calculate Impact in Basispoints"""
+        if old_price == None or new_price == None:
+            return None
+        elif old_price == 0:
+            return old_price
+        return (new_price - old_price) / old_price * 10000
