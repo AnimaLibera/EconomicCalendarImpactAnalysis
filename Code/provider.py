@@ -38,6 +38,6 @@ class Provider:
 
         for element in json_data:
             rates.append(element["close"])
-            datetime.append(element["date"])
+            datetime.append(pd.Timestamp(element["date"]))
 
         return pd.Series(data=rates, index=datetime)

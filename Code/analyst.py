@@ -1,9 +1,10 @@
-import provider as pd
+import provider as pv
+import pandas as pd
 
 class Analyst:
 
     def __init__(self, start_date, end_date):
-        self.raw_economic_calendar = pd.Provider().economic_calendar(start_date, end_date)
+        self.raw_economic_calendar = pv.Provider().economic_calendar(start_date, end_date)
         self.raw_events = self.extract_events()
         self.clean_high_impact_events = self.clean_events(self.extract_high_impact_events())
         self.raw_countrys = self.extract_countrys()
@@ -50,4 +51,31 @@ class Analyst:
         countrys = []
         for element in self.raw_economic_calendar:
             countrys.append(element["country"])
-        return countrys 
+        return countrys
+    
+    def impact_analysis(self, country = "US", pair = "EURUSD"):
+        """Build Dataframe for Impact Analysis"""
+
+        dates = []
+        records = []
+
+        for element in self.raw_economic_calendar:
+            if element["impact"] == "High" and element["country"] == country:
+                datetime = pd.Timestamp(element["date"])
+                event = self.clean_event(element["event"])
+                expectation = element["estimate"]
+                actual = element["actual"]
+                deviation = self.calculate_deviation(expectation, actual)
+                record = [event, expectation, actual, deviation]
+                dates.append(datetime)
+                records.append(record)
+        
+        frame = pd.DataFrame(data = records, index=dates, columns=["Event", "Expectation", "Actual", "Deviation"])
+
+        return frame
+    
+    def calculate_deviation(self, expectation, actual):
+        """Calculate Deviation"""
+        if actual == None or expectation == None:
+            return None
+        return (actual - expectation) / expectation
