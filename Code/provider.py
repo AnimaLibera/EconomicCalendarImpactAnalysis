@@ -41,12 +41,15 @@ class Provider:
     
         return json_data
     
-    def foreign_exchange_rates_minute_close(self, datetime = "2019-10-09-13:24", pair = "EURUSD"):
-         """Get Close for Minute-Bar"""
-
-         data = self.foreign_exchange_rates_timestamp(datetime, pair)
-         
-         return data["close"]
+    def foreign_exchange_rate_minute_close(self, timestamp, pair = "EURUSD"):
+        """Get Close for Minute-Bar"""
+        
+        datetime = timestamp.strftime("%Y-%m-%d-%H:%M")
+        data = self.foreign_exchange_rates_timestamp(datetime, pair)
+        
+        if "close" in data:
+             return data["close"]
+        return None
 
     def parse_fx_rates(self, json_data):
         """Parse Foreign Exchange Rates"""

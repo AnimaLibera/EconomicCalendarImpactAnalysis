@@ -95,13 +95,19 @@ class Analyst:
             return expectation
         return (actual - expectation) / expectation
     
+    #def get_fx_price(self, datetime):
+    #    """Get Foreign Exchange Price"""
+    #
+    #    if datetime in self.fx_prices.index:
+    #        return self.fx_prices[datetime]
+    #    else:
+    #        return None
+    
     def get_fx_price(self, datetime):
         """Get Foreign Exchange Price"""
 
-        if datetime in self.fx_prices.index:
-            return self.fx_prices[datetime]
-        else:
-            return None
+        return self.provider.foreign_exchange_rate_minute_close(datetime, pair = "EURUSD")
+    
 
     def calculate_impact(self, old_price, new_price):
         """Calculate Impact in Basispoints"""
