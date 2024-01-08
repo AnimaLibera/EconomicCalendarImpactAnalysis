@@ -12,6 +12,7 @@ class Provider:
             """Load Environment from File"""
             load_dotenv("../Secrets/Tokens.env")
             self.fmp_token = os.getenv("FMP")
+            self.tradermate_token = os.getenv("TRADERMATE")
 
     def economic_calendar(self, start_date, end_date):
         """Get Economic Calendar"""
@@ -31,6 +32,22 @@ class Provider:
 
         return self.parse_fx_rates(json_data)
     
+    def foreign_exchange_rates_timestamp(self, datetime = "2019-10-09-13:24", pair = "EURUSD"):
+        """Get Foreign Exchange Rates by Timestamp for Minute-Bar"""
+
+        endpoint = f"https://marketdata.tradermade.com/api/v1/minute_historical?currency={pair}&date_time={datetime}&api_key={self.tradermate_token}"
+        response = requests.get(endpoint)
+        json_data = response.json()
+    
+        return json_data
+    
+    def foreign_exchange_rates_minute_close(self, datetime = "2019-10-09-13:24", pair = "EURUSD"):
+         """Get Close for Minute-Bar"""
+
+         data = self.foreign_exchange_rates_timestamp(datetime, pair)
+         
+         return data["close"]
+
     def parse_fx_rates(self, json_data):
         """Parse Foreign Exchange Rates"""
         rates = []
