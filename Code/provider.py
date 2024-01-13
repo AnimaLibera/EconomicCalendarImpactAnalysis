@@ -77,29 +77,45 @@ class Provider:
     def load_csv_to_dataframe(self, relativ_file_path = "../Data/", file_name = "EURUSD_M1_GMT+2_2020-01-02-0600_2023-12-29-2358.csv"):
         """Load CSV to DataFrame"""
         
-        data = pd.read_csv(relativ_file_path + file_name, sep="\t", index_col = None, parse_dates = True)
+        data = pd.read_csv(relativ_file_path + file_name, sep="\t", index_col = None, parse_dates = False)
+        return data
+
+    def preprocess_csv_dataframe(self, data):
+        """Preprocess CSV Dataframe"""
+
+        data["timestap"] = (data["<DATE>"] + " " + data["<TIME>"]).map(lambda string: datetime.strptime(string, "%Y.%m.%d %H:%M:%S"))
+        data.drop(columns = ["<DATE>", "<TIME>", "<TICKVOL>", "<VOL>"], inplace = True)
+        data.columns = ["open", "high", "low", "close", "spread", "timestamp"]
+        data.set_index("timestamp", inplace = True)
+
         return data
 
     def populate_database(self):
         """Populate Database with CSV Data"""
 
         data = self.load_csv_to_dataframe()
-        database = Database()
+        data = data.iloc[:100]
+        data = self.preprocess_csv_dataframe(data)
+        #print(data)
+        #print(data.dtypes)
+        #print("Success")
+        
+        #database = Database()
+        
+        #for index, row in data.iloc[:-7200].iterrows():
+        #    timestampString = row["<DATE>"] + " " + row["<TIME>"]
+        #    timestamp = datetime.strptime(timestampString, "%Y.%m.%d %H:%M:%S")
+        #    bar = {}
+        #    bar["timestamp"] = timestamp
+        #    bar["symbol"] = "EURUSD"
+        #    bar["timeframe"] = "1min"
+        #    bar["open"] = row["<OPEN>"]
+        #    bar["high"] = row["<HIGH>"]
+        #    bar["low"] = row["<LOW>"]
+        #    bar["close"] = row["<CLOSE>"]
+        #    bar["spread"] = row["<SPREAD>"]
 
-        for index, row in data.iloc[:-7200].iterrows():
-            timestampString = row["<DATE>"] + " " + row["<TIME>"]
-            timestamp = datetime.strptime(timestampString, "%Y.%m.%d %H:%M:%S")
-            bar = {}
-            bar["timestamp"] = timestamp
-            bar["symbol"] = "EURUSD"
-            bar["timeframe"] = "1min"
-            bar["open"] = row["<OPEN>"]
-            bar["high"] = row["<HIGH>"]
-            bar["low"] = row["<LOW>"]
-            bar["close"] = row["<CLOSE>"]
-            bar["spread"] = row["<SPREAD>"]
-
-            database.insert_bar(bar)
+        #    database.insert_bar(bar)
 
 class Database():
     """Class to fetch and update SQLite3 Bar Data"""
@@ -188,4 +204,4 @@ if __name__ == "__main__":
     provider = Provider()
     #provider.foreign_exchange_rate_database()
     provider.populate_database()
-    database.print_first_last()
+    #database.print_first_last()
