@@ -79,11 +79,11 @@ class Analyst:
                 second_impact = self.calculate_impact(price_1min, price_10min)
                 third_impact = self.calculate_impact(price_1min, price_30min)
 
-                record = [event, expectation, actual, deviation, price_now, price_1min, price_5min, first_impact, second_impact, third_impact]
+                record = [event, expectation, actual, deviation, price_now, price_1min, price_5min, price_10min, price_30min, first_impact, second_impact, third_impact]
                 dates.append(datetime)
                 records.append(record)
         
-        frame = pd.DataFrame(data = records, index=dates, columns=["Event", "Expectation", "Actual", "Deviation", "Price Now", "Price 1Min", "Price 5Min", "First Impact", "Second Impact", "Third Impact"])
+        frame = pd.DataFrame(data = records, index=dates, columns=["Event", "Expectation", "Actual", "Deviation", "Price Now", "Price 1Min", "Price 5Min", "Price 10Min", "Price30Min", "First Impact", "Second Impact", "Third Impact"])
 
         return frame
     
