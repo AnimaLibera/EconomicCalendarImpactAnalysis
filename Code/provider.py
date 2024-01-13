@@ -63,6 +63,14 @@ class Provider:
             datetime.append(pd.Timestamp(element["date"]))
 
         return pd.Series(data=rates, index=datetime)
+    
+    def foreign_exchange_rate_database(self, timestamp = pd.Timestamp("2020-01-02-06:00"), pair = "EURUSD"):
+        """Get Foreign Exchange Rates from Database"""
+
+        database = Database()
+        bar = database.get_bar(timestamp, pair, "1min")
+        print(bar)
+
 
     def load_csv_to_dataframe(self, relativ_file_path = "../Data/", file_name = "EURUSD_M1_GMT+2_2020-01-02-0600_2023-12-29-2358.csv"):
         """Load CSV to DataFrame"""
@@ -113,7 +121,7 @@ class Database():
                         low REAL NOT NULL,
                         close REAL NOT NULL,
                         spread INTEGER NOT NULL,
-                        PRIMARY KEY(timestamp,symbol)
+                        PRIMARY KEY(timestamp,symbol,timeframe)
                         );""" #Timestamp ISO8601 YYYY-MM-DD HH:MM:SS.SSSSSS
         cursor = self.connection.cursor()
         cursor.execute(command)    
@@ -122,6 +130,16 @@ class Database():
         command = "DROP TABLE IF EXISTS bars"
         cursor = self.connection.cursor()
         cursor.execute(command)
+
+    def print_first_last(self):
+        """Print First and Last Bar in Database"""
+        command = "SELECT * FROM bars;"
+        cursor = self.connection.cursor()
+        cursor.execute(command)
+        result = cursor.fetchall()
+        print("Printing first and last Bars in Database:")
+        print(result[0])
+        print(result[-1])
 
     def insert_bar(self, bar):
         command = 'INSERT INTO bars(timestamp,symbol,timeframe,open,high,low,close,spread) VALUES(?,?,?,?,?,?,?,?)'
@@ -139,7 +157,7 @@ class Database():
             cursor.execute(command, (timestampString, symbol, timeframe))
             result = cursor.fetchone()
             bar = {}
-            bar["timestamp"] = dt.datetime.strptime(result[0], "%Y-%m-%d %H:%M:%S.%f")
+            bar["timestamp"] = datetime.strptime(result[0], "%Y-%m-%d %H:%M:%S.%f")
             bar["symbol"] = result[1]
             bar["timeframe"] = result[2]
             bar["open"] = result[3]
@@ -162,7 +180,11 @@ class Database():
 
 if __name__ == "__main__":
     database = Database()
-    database.drop_table()
-    database.create_table()
+    database.print_first_last()
+
+    #database.drop_table()
+    #database.create_table()
+
     provider = Provider()
-    provider.populate_database()
+    provider.foreign_exchange_rate_database()
+    #provider.populate_database()
