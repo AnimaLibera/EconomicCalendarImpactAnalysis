@@ -116,3 +116,12 @@ class Analyst:
         elif old_price == 0:
             return old_price
         return (new_price - old_price) / old_price * 10000
+    
+
+if __name__ == "__main__":
+
+    start_date = "2024-01-01"
+    end_date = "2024-01-07"
+    analyst = Analyst(start_date, end_date)
+    frame = analyst.impact_analysis()
+    print(frame)

@@ -46,8 +46,9 @@ class Provider:
     def foreign_exchange_rate_minute_close(self, timestamp, pair = "EURUSD"):
         """Get Close for Minute-Bar"""
         
-        datetime = timestamp.strftime("%Y-%m-%d-%H:%M")
-        data = self.foreign_exchange_rates_timestamp(datetime, pair)
+        #datetime = timestamp.strftime("%Y-%m-%d-%H:%M")
+        print(timestamp)
+        data = self.foreign_exchange_rate_database(timestamp, pair)
         
         if "close" in data:
              return data["close"]
@@ -69,7 +70,8 @@ class Provider:
 
         database = Database()
         bar = database.get_bar(timestamp, pair, "1min")
-        print(bar)
+        
+        return bar
 
 
     def load_csv_to_dataframe(self, relativ_file_path = "../Data/", file_name = "EURUSD_M1_GMT+2_2020-01-02-0600_2023-12-29-2358.csv"):
@@ -84,7 +86,7 @@ class Provider:
         data = self.load_csv_to_dataframe()
         database = Database()
 
-        for index, row in data.iloc[:10].iterrows():
+        for index, row in data.iloc[:-7200].iterrows():
             timestampString = row["<DATE>"] + " " + row["<TIME>"]
             timestamp = datetime.strptime(timestampString, "%Y.%m.%d %H:%M:%S")
             bar = {}
@@ -180,11 +182,10 @@ class Database():
 
 if __name__ == "__main__":
     database = Database()
-    database.print_first_last()
-
-    #database.drop_table()
-    #database.create_table()
+    database.drop_table()
+    database.create_table()
 
     provider = Provider()
-    provider.foreign_exchange_rate_database()
-    #provider.populate_database()
+    #provider.foreign_exchange_rate_database()
+    provider.populate_database()
+    database.print_first_last()
