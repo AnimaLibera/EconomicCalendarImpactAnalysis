@@ -103,6 +103,15 @@ class Provider:
         engine = create_engine("sqlite:///../Data/market.db")
         data.to_sql("bars", engine, if_exists = "append", index = True)
 
+    def print_cycle_dataframe(self, data):
+
+        for index, row in data.iterrows():
+            print(index, row)
+    
+    def populate_csv_file(self, data, relativ_file_path = "../Data/", file_name = "market.csv"):
+
+        data.to_csv(relativ_file_path + file_name, sep = "\t", index = True)
+
 class Database():
     """Class to fetch and update SQLite3 Bar Data"""
 
@@ -183,11 +192,18 @@ class Database():
             return bar
 
 if __name__ == "__main__":
-    database = Database()
-    database.drop_table()
-    database.create_table()
+    #database = Database()
+    #database.drop_table()
+    #database.create_table()
 
     provider = Provider()
+    print("Step #1")
+    raw_data = provider.load_csv_to_dataframe()
+    print("Step #2")
+    clean_data = provider.preprocess_csv_dataframe(raw_data)
+    print("Step #3")
+    provider.populate_csv_file(clean_data)
+    
     #provider.foreign_exchange_rate_database()
-    provider.populate_database()
-    database.print_first_last()
+    #provider.populate_database()
+    #database.print_first_last()
