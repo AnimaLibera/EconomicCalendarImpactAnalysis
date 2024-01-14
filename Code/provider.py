@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from datetime import datetime
+from sqlalchemy import create_engine
 import pandas as pd
 import requests
 import sqlite3
@@ -96,28 +97,11 @@ class Provider:
         """Populate Database with CSV Data"""
 
         data = self.load_csv_to_dataframe()
-        data = data.iloc[:100]
+        #data = data.iloc[:100]
         data = self.preprocess_csv_dataframe(data)
-        print(data)
-        print(data.dtypes)
-        print("Success")
-        
-        #database = Database()
-        
-        #for index, row in data.iloc[:-7200].iterrows():
-        #    timestampString = row["<DATE>"] + " " + row["<TIME>"]
-        #    timestamp = datetime.strptime(timestampString, "%Y.%m.%d %H:%M:%S")
-        #    bar = {}
-        #    bar["timestamp"] = timestamp
-        #    bar["symbol"] = "EURUSD"
-        #    bar["timeframe"] = "1min"
-        #    bar["open"] = row["<OPEN>"]
-        #    bar["high"] = row["<HIGH>"]
-        #    bar["low"] = row["<LOW>"]
-        #    bar["close"] = row["<CLOSE>"]
-        #    bar["spread"] = row["<SPREAD>"]
 
-        #    database.insert_bar(bar)
+        engine = create_engine("sqlite:///../Data/market.db")
+        data.to_sql("bars", engine, if_exists = "append", index = True)
 
 class Database():
     """Class to fetch and update SQLite3 Bar Data"""
@@ -206,4 +190,4 @@ if __name__ == "__main__":
     provider = Provider()
     #provider.foreign_exchange_rate_database()
     provider.populate_database()
-    #database.print_first_last()
+    database.print_first_last()
