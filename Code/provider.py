@@ -81,14 +81,15 @@ class Provider:
         data = pd.read_csv(relativ_file_path + file_name, sep="\t", index_col = None, parse_dates = False)
         return data
 
-    def preprocess_csv_dataframe(self, data, symbol = "EURUSD", timeframe = "1min"):
+    def preprocess_csv_dataframe(self, data, symbol = "EURUSD", timeframe = "1min", timezone = "GMT+2"):
         """Preprocess CSV Dataframe"""
 
         data["timestap"] = (data["<DATE>"] + " " + data["<TIME>"]).map(lambda string: datetime.strptime(string, "%Y.%m.%d %H:%M:%S"))
         data["symbol"] = symbol
         data["timeframe"] = timeframe
+        data["timezone"] = timezone
         data.drop(columns = ["<DATE>", "<TIME>", "<TICKVOL>", "<VOL>"], inplace = True)
-        data.columns = ["open", "high", "low", "close", "spread", "timestamp", "symbol", "timeframe"]
+        data.columns = ["open", "high", "low", "close", "spread", "timestamp", "symbol", "timeframe", "timezone"]
         data.set_index("timestamp", inplace = True)
 
         return data
