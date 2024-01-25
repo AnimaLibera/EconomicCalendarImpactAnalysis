@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import requests
 import sqlite3
+import pytz
 import os
 
 class Provider:
@@ -81,15 +82,15 @@ class Provider:
         data = pd.read_csv(relativ_file_path + file_name, sep="\t", index_col = None, parse_dates = False)
         return data
 
-    def preprocess_csv_dataframe(self, data, symbol = "EURUSD", timeframe = "1min", timezone = "GMT+2"):
-        """Preprocess CSV Dataframe"""
+    def preprocess_csv_dataframe(self, data, symbol = "EURUSD", timeframe = "1min", timezone = "Etc/GMT+2"):
+        """Preprocess CSV Dataframe: timezone is pytz Timezone"""
 
-        data["timestap"] = (data["<DATE>"] + " " + data["<TIME>"]).map(lambda string: datetime.strptime(string, "%Y.%m.%d %H:%M:%S"))
+        tz = pytz.timezone(timezone)
+        data["timestap"] = (data["<DATE>"] + " " + data["<TIME>"]).map(lambda string: datetime.strptime(string, "%Y.%m.%d %H:%M:%S").replace(tzinfo=tz))
         data["symbol"] = symbol
         data["timeframe"] = timeframe
-        data["timezone"] = timezone
         data.drop(columns = ["<DATE>", "<TIME>", "<TICKVOL>", "<VOL>"], inplace = True)
-        data.columns = ["open", "high", "low", "close", "spread", "timestamp", "symbol", "timeframe", "timezone"]
+        data.columns = ["open", "high", "low", "close", "spread", "timestamp", "symbol", "timeframe"]
         data.set_index("timestamp", inplace = True)
 
         return data
@@ -98,7 +99,7 @@ class Provider:
         """Populate Database with CSV Data"""
 
         data = self.load_csv_to_dataframe()
-        #data = data.iloc[:100]
+        #data = data.iloc[:10]
         data = self.preprocess_csv_dataframe(data)
 
         engine = create_engine("sqlite:///../Data/market.db")
