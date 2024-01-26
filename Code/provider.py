@@ -44,7 +44,7 @@ class Provider:
     
         return json_data
     
-    def foreign_exchange_rate_minute_close(self, timestamp, pair = "EURUSD"):
+    def foreign_exchange_rate_minute_close(self, timestamp, pair = "EURUSD", price = "close"):
         """Get Close for Minute-Bar"""
         
         #datetime = timestamp.strftime("%Y-%m-%d-%H:%M")
@@ -54,8 +54,8 @@ class Provider:
 
         #print(data)
 
-        if type(data) == pd.core.frame.DataFrame and "close" in data and timestamp in data.index:
-             return data.loc[timestamp]["close"]
+        if type(data) == pd.core.frame.DataFrame and price in data and timestamp in data.index:
+             return data.loc[timestamp][price]
         return None
 
     def foreign_exchange_rate_influxdb(self, timestamp, pair):

@@ -5,7 +5,7 @@ import pytz
 class MetaTrader5:
     """MetaTrader5 Dataprovider"""
 
-    def load_csv_to_dataframe(self, relativ_file_path = "../Data/", file_name = "EURUSD_M1_GMT+2_2020-01-02-0600_2023-12-29-2358.csv"):
+    def load_csv_to_dataframe(self, relativ_file_path = "../Data/", file_name = "EURUSD_M1_GMT+2_202401020000_202401260000.csv"):
         """Load CSV to DataFrame"""
         
         data = pd.read_csv(relativ_file_path + file_name, sep="\t", index_col = None, parse_dates = False)

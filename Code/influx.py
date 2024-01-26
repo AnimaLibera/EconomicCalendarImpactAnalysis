@@ -12,7 +12,7 @@ class InfluxDatabase:
         self.influx_organisation = "NaturalPerson"
         self.infux_bucket = "NewMarket"
         self.influx_url = "http://localhost:8086"
-        self.client = db.InfluxDBClient(url=self.influx_url, token=self.influx_token, org=self.influx_organisation, debug=False)
+        self.client = db.InfluxDBClient(url=self.influx_url, token=self.influx_token, org=self.influx_organisation, debug=True)
         self.write_api = self.client.write_api(write_options=db.WriteOptions(batch_size=5_000, flush_interval=1_000))
         self.query_api = self.client.query_api()
     
@@ -25,7 +25,7 @@ class InfluxDatabase:
         """Ingest stepwise Data into InfluxDB"""
 
         row_numbers = data_frame.shape[0]
-        step = row_numbers // 10
+        step = 5000
         start = 0
         stop = 0
         counter = 1
@@ -44,7 +44,7 @@ class InfluxDatabase:
             start += step
             counter += 1
 
-    def query_data(self, time = pd.Timestamp("2024-12-01T00"), symbol = "EURUSD", timeframe = "1min"):
+    def query_data(self, time = pd.Timestamp("2024-01-25T13:30"), symbol = "EURUSD", timeframe = "1min"):
         """Query Pricedata from InfluxDB"""
 
         unix_start = int(time.timestamp())

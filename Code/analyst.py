@@ -70,20 +70,22 @@ class Analyst:
                 expectation = element["estimate"]
                 actual = element["actual"]
                 deviation = self.calculate_deviation(expectation, actual)
-                price_now = self.get_fx_price(datetime)
+                price_now_open = self.get_fx_price(datetime, "open")
+                price_now = self.get_fx_price(datetime) #Close
                 price_1min = self.get_fx_price(datetime + pd.Timedelta(minutes=1))
                 price_5min = self.get_fx_price(datetime + pd.Timedelta(minutes=5))
                 price_10min = self.get_fx_price(datetime + pd.Timedelta(minutes=10))
                 price_30min = self.get_fx_price(datetime + pd.Timedelta(minutes=30))
-                first_impact = self.calculate_impact(price_1min, price_5min)
-                second_impact = self.calculate_impact(price_1min, price_10min)
-                third_impact = self.calculate_impact(price_1min, price_30min)
+                original_impact = self.calculate_impact(price_now_open, price_now)
+                first_impact = self.calculate_impact(price_now, price_5min)
+                second_impact = self.calculate_impact(price_now, price_10min)
+                third_impact = self.calculate_impact(price_now, price_30min)
 
-                record = [event, expectation, actual, deviation, price_now, price_1min, price_5min, price_10min, price_30min, first_impact, second_impact, third_impact]
+                record = [event, expectation, actual, deviation, price_now_open, price_now, price_5min, price_10min, price_30min, original_impact, first_impact, second_impact, third_impact]
                 dates.append(datetime)
                 records.append(record)
         
-        frame = pd.DataFrame(data = records, index=dates, columns=["Event", "Expectation", "Actual", "Deviation", "Price Now", "Price 1Min", "Price 5Min", "Price 10Min", "Price30Min", "First Impact", "Second Impact", "Third Impact"])
+        frame = pd.DataFrame(data = records, index=dates, columns=["Event", "Expectation", "Actual", "Deviation", "Price Now Open", "Price Now Close", "Price 5Min", "Price 10Min", "Price 30Min", "Original Impact", "First Impact", "Second Impact", "Third Impact"])
 
         return frame
     
@@ -103,10 +105,10 @@ class Analyst:
     #    else:
     #        return None
     
-    def get_fx_price(self, datetime):
+    def get_fx_price(self, datetime, price = "close"):
         """Get Foreign Exchange Price"""
 
-        return self.provider.foreign_exchange_rate_minute_close(datetime, pair = "EURUSD")
+        return self.provider.foreign_exchange_rate_minute_close(datetime, pair = "EURUSD", price = price)
     
 
     def calculate_impact(self, old_price, new_price):
@@ -120,8 +122,9 @@ class Analyst:
 
 if __name__ == "__main__":
 
-    start_date = "2023-11-01"
-    end_date = "2023-12-01"
+    start_date = "2024-01-01"
+    end_date = "2024-01-25"
     analyst = Analyst(start_date, end_date)
     frame = analyst.impact_analysis()
     print(frame)
+    frame.to_html("../Report/ImpactAnalysis.html")
