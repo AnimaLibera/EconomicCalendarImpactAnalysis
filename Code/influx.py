@@ -44,11 +44,11 @@ class InfluxDatabase:
             start += step
             counter += 1
 
-    def query_data(self, start = pd.Timestamp("2023-12-01T00"), stop = pd.Timestamp("2024-01-01T00"), symbol = "EURUSD", timeframe = "1min"):
+    def query_data(self, time = pd.Timestamp("2024-12-01T00"), symbol = "EURUSD", timeframe = "1min"):
         """Query Pricedata from InfluxDB"""
 
-        unix_start = int(start.timestamp())
-        unix_stop = int(stop.timestamp())
+        unix_start = int(time.timestamp())
+        unix_stop = int((time + pd.Timedelta(minutes=1)).timestamp())
 
         query = f"""
             from(bucket: "{self.infux_bucket}")
@@ -60,6 +60,19 @@ class InfluxDatabase:
         """
 
         return self.query_api.query_data_frame(query)
+
+    def preprocess_query_dataframe(self, data_frame):
+        """Preprocess Query Dataframe"""
+
+        if data_frame.empty:
+            return None
+
+        data_frame.drop(columns = ["result", "table", "_measurement", "_start", "_stop"], inplace = True)
+        data_frame.rename(columns={"_time": "timestamp"}, inplace = True)
+        data_frame.set_index("timestamp", inplace = True)
+
+        return data_frame
+
 
 if __name__ == "__main__":
     
@@ -78,5 +91,8 @@ if __name__ == "__main__":
     
     if True:
         print("Query Data")
-        query_data = InfluxDatabase().query_data()
+        db = InfluxDatabase()
+        query_data = db.query_data()
         print(query_data)
+        clean_data = db.preprocess_query_dataframe(query_data)
+        print(clean_data)
