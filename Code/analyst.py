@@ -10,7 +10,7 @@ class Analyst:
         self.clean_high_impact_events = self.clean_events(self.extract_high_impact_events())
         self.raw_countrys = self.extract_countrys()
         self.unique_countrys = set(self.raw_countrys)
-        self.fx_prices = self.provider.foreign_exchange_rates(start_date, end_date)
+        #self.fx_prices = self.provider.foreign_exchange_rates(start_date, end_date)
 
     def extract_events(self):
         """Extract Economic Calendar Events"""
@@ -65,7 +65,7 @@ class Analyst:
 
         for element in self.raw_economic_calendar:
             if element["impact"] == "High" and element["country"] == country:
-                datetime = pd.Timestamp(element["date"])
+                datetime = pd.Timestamp(element["date"]).tz_localize(tz="Etc/GMT")
                 event = self.clean_event(element["event"])
                 expectation = element["estimate"]
                 actual = element["actual"]
@@ -120,8 +120,8 @@ class Analyst:
 
 if __name__ == "__main__":
 
-    start_date = "2024-01-01"
-    end_date = "2024-01-07"
+    start_date = "2023-11-01"
+    end_date = "2023-12-01"
     analyst = Analyst(start_date, end_date)
     frame = analyst.impact_analysis()
     print(frame)

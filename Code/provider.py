@@ -2,7 +2,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 import pandas as pd
 import requests
-
+import influx
 import pytz
 import os
 
@@ -49,11 +49,23 @@ class Provider:
         
         #datetime = timestamp.strftime("%Y-%m-%d-%H:%M")
         print(timestamp)
-        data = self.foreign_exchange_rate_database(timestamp, pair)
-        
-        if "close" in data:
-             return data["close"]
+        #data = self.foreign_exchange_rate_database(timestamp, pair)
+        data = self.foreign_exchange_rate_influxdb(timestamp, pair)
+
+        #print(data)
+
+        if type(data) == pd.core.frame.DataFrame and "close" in data and timestamp in data.index:
+             return data.loc[timestamp]["close"]
         return None
+
+    def foreign_exchange_rate_influxdb(self, timestamp, pair):
+        """Get Foreign Exchange Rates from InfluxDB"""
+
+        database = influx.InfluxDatabase()
+        query_data = database.query_data(timestamp, pair, "1min")
+        clean_data = database.preprocess_query_dataframe(query_data)
+
+        return clean_data
 
     def parse_fx_rates(self, json_data):
         """Parse Foreign Exchange Rates"""
