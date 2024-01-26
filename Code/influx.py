@@ -12,8 +12,9 @@ class InfluxDatabase:
         self.influx_organisation = "NaturalPerson"
         self.infux_bucket = "NewMarket"
         self.influx_url = "http://localhost:8086"
-        self.client = db.InfluxDBClient(url=self.influx_url, token=self.influx_token, org=self.influx_organisation, debug=True)
-        self.write_api = self.client.write_api(write_options=db.WriteOptions(batch_size=5_000, flush_interval=1_000))
+        self.client = db.InfluxDBClient(url=self.influx_url, token=self.influx_token, org=self.influx_organisation, debug=False)
+        #self.write_api = self.client.write_api(write_options=db.WriteOptions(batch_size=5_000, flush_interval=1_000))
+        self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
         self.query_api = self.client.query_api()
     
     def environment(self):
@@ -44,6 +45,11 @@ class InfluxDatabase:
             start += step
             counter += 1
 
+    def ingest_events(self, data_frame, measurement_name = "events", tag_columns = ["currency", "impact"]):
+        """Call ingest_data with right Arguments to ingest Events into InfluxDB"""
+
+        self.ingest_data(data_frame, measurement_name, tag_columns)
+
     def query_data(self, time = pd.Timestamp("2024-01-25T13:30"), symbol = "EURUSD", timeframe = "1min"):
         """Query Pricedata from InfluxDB"""
 
@@ -56,6 +62,23 @@ class InfluxDatabase:
             |> filter(fn: (r) => r._measurement == "prices")
             |> filter(fn: (r) => r.symbol == "{symbol}")
             |> filter(fn: (r) => r.timeframe == "{timeframe}")
+            |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+        """
+
+        return self.query_api.query_data_frame(query)
+
+    def query_events(self, start = pd.Timestamp("2024-01-01T00:00"), stop = pd.Timestamp("2024-01-26T00:00"), currency = "USD", impact = "High"):
+        """Query Events from InfluxDB"""
+
+        unix_start = int(start.timestamp())
+        unix_stop = int((stop.timestamp()))
+
+        query = f"""
+            from(bucket: "{self.infux_bucket}")
+            |> range(start: {unix_start}, stop: {unix_stop})
+            |> filter(fn: (r) => r._measurement == "events")
+            |> filter(fn: (r) => r.currency == "{currency}")
+            |> filter(fn: (r) => r.impact == "{impact}")
             |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
         """
 

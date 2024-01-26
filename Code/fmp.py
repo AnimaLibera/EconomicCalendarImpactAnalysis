@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from datetime import datetime
 import pandas as pd
+import influx
 import requests
 import pytz
 import os
@@ -57,13 +58,21 @@ class FinancialModelingPrep:
             return False
 
 if __name__ == "__main__":
-     
-    start_date = "2024-01-01"
-    stop_date = "2024-01-25"
+    
+    if False:
+        start_date = "2024-01-01"
+        stop_date = "2024-01-25"
 
-    FMP = FinancialModelingPrep()
-    json_data = FMP.economic_calendar(start_date, stop_date)
-    df = FMP.parse_economic_calendar_to_dataframe(json_data)
-    nice_df = FMP.preprocess_economic_calendar(df)
-    print(nice_df)
+        FMP = FinancialModelingPrep()
+        json_data = FMP.economic_calendar(start_date, stop_date)
+        df = FMP.parse_economic_calendar_to_dataframe(json_data)
+        nice_df = FMP.preprocess_economic_calendar(df)
+        DB = influx.InfluxDatabase()
+        DB.ingest_events(nice_df)
+        print(nice_df)
      
+    if True:
+        DB = influx.InfluxDatabase()
+        data = DB.query_events(currency="JPY", impact="Medium")
+        nice_data = DB.preprocess_query_dataframe(data)
+        print(nice_data)
