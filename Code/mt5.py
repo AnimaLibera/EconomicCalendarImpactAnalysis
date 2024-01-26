@@ -9,7 +9,7 @@ class MetaTrader5:
         """Load CSV to DataFrame"""
         
         data = pd.read_csv(relativ_file_path + file_name, sep="\t", index_col = None, parse_dates = False)
-        return data.iloc[:10]
+        return data
 
     def preprocess_csv_dataframe(self, data, symbol = "EURUSD", timeframe = "1min", timezone = "Etc/GMT+2"):
         """Preprocess CSV Dataframe: timezone is pytz Timezone"""

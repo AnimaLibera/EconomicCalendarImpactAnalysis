@@ -12,8 +12,8 @@ class InfluxDatabase:
         self.influx_organisation = "NaturalPerson"
         self.infux_bucket = "NewMarket"
         self.influx_url = "http://localhost:8086"
-        self.client = db.InfluxDBClient(url=self.influx_url, token=self.influx_token, org=self.influx_organisation)
-        self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
+        self.client = db.InfluxDBClient(url=self.influx_url, token=self.influx_token, org=self.influx_organisation, debug=False)
+        self.write_api = self.client.write_api(write_options=db.WriteOptions(batch_size=5_000, flush_interval=1_000))
         self.query_api = self.client.query_api()
     
     def environment(self):
@@ -22,20 +22,40 @@ class InfluxDatabase:
         self.influx_token = os.getenv("INFLUX")
 
     def ingest_data(self, data_frame, measurement_name = "prices", tag_columns = ["symbol", "timeframe"]):
-         """Ingest Data into InfluxDB"""
+        """Ingest stepwise Data into InfluxDB"""
 
-         self.write_api.write(self.infux_bucket, self.influx_organisation, record = data_frame, data_frame_measurement_name = measurement_name, data_frame_tag_columns = tag_columns)
+        row_numbers = data_frame.shape[0]
+        step = row_numbers // 10
+        start = 0
+        stop = 0
+        counter = 1
 
-    def query_data(self, symbol = "EURUSD", timeframe = "1min"):
+        while stop < row_numbers:
+
+            stop += step
+
+            if stop > row_numbers:
+                stop = row_numbers
+
+            print(f"Counter: {counter}, Start at: {start}, Stop at: {stop}")
+
+            self.write_api.write(self.infux_bucket, self.influx_organisation, record = data_frame.iloc[start:stop], data_frame_measurement_name = measurement_name, data_frame_tag_columns = tag_columns)
+
+            start += step
+            counter += 1
+
+    def query_data(self, start = pd.Timestamp("2023-12-01T00"), stop = pd.Timestamp("2024-01-01T00"), symbol = "EURUSD", timeframe = "1min"):
         """Query Pricedata from InfluxDB"""
+
+        unix_start = int(start.timestamp())
+        unix_stop = int(stop.timestamp())
 
         query = f"""
             from(bucket: "{self.infux_bucket}")
-            |> range(start:0)
+            |> range(start: {unix_start}, stop: {unix_stop})
             |> filter(fn: (r) => r._measurement == "prices")
             |> filter(fn: (r) => r.symbol == "{symbol}")
             |> filter(fn: (r) => r.timeframe == "{timeframe}")
-            |> tail(n: 10)
             |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
         """
 
@@ -54,7 +74,7 @@ if __name__ == "__main__":
         print("Step #3")
         database = InfluxDatabase()
         print("Step #4")
-        database.ingest_data(clean_data.iloc)
+        database.ingest_data(clean_data)
     
     if True:
         print("Query Data")
