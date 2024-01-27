@@ -60,8 +60,8 @@ class FinancialModelingPrep:
 if __name__ == "__main__":
     
     if False:
-        start_date = "2024-01-01"
-        stop_date = "2024-01-25"
+        start_date = "2023-01-01"
+        stop_date = "2024-01-01"
 
         FMP = FinancialModelingPrep()
         json_data = FMP.economic_calendar(start_date, stop_date)

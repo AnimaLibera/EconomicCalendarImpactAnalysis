@@ -7,7 +7,7 @@ class Analyst:
     def __init__(self, start_date, end_date):
         self.provider = pv.Provider()
         self.influx = influx.InfluxDatabase()
-        self.nice_economic_calendar = self.influx.preprocess_query_dataframe(self.influx.query_events())
+        self.nice_economic_calendar = self.influx.preprocess_query_dataframe(self.influx.query_events(start = pd.Timestamp("2023-01-01T00:00"), stop = pd.Timestamp("2024-01-01T00:00")))
         self.raw_economic_calendar = self.provider.economic_calendar(start_date, end_date)
         self.raw_events = self.extract_events()
         self.clean_high_impact_events = self.clean_events(self.extract_high_impact_events())
@@ -151,3 +151,7 @@ if __name__ == "__main__":
     frame = analyst.new_impact_analysis()
     print(frame)
     frame.to_html("../Report/ImpactAnalysis.html")
+    #group_frame = frame.groupby("event")["first impact"].count()
+    #print(group_frame)
+    grouped = frame.groupby("event")
+    print(grouped.get_group("PPI MoM"))
