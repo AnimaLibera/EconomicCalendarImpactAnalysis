@@ -78,19 +78,22 @@ class FinancialModelingPrep:
         print("Ingesting Economic Calendar")
         self.database.ingest_events(nice_df)
 
-if __name__ == "__main__":
-    
-    if False:
-        start_date = "2023-01-01"
-        stop_date = "2024-01-01"
+    def economic_calendar_pipeline_longrange(self, start_date = pd.Timestamp("2023-01-01"), end_date = pd.Timestamp("2024-01-01"), time_step = pd.Timedelta(days=30)):
+        """Stepwise pipe Economic Calendat Data"""
 
-        FMP = FinancialModelingPrep()
-        json_data = FMP.economic_calendar(start_date, stop_date)
-        df = FMP.parse_economic_calendar_to_dataframe(json_data)
-        nice_df = FMP.preprocess_economic_calendar(df)
-        DB = influx.InfluxDatabase()
-        DB.ingest_events(nice_df)
-        print(nice_df)
+        while start_date < end_date:
+            medium_date = start_date + time_step
+
+            if medium_date > end_date:
+                medium_date = end_date
+
+            print(f"Piping Economic Calendar from {start_date} to {medium_date}")
+            self.economic_calendar_pipeline(start_date, medium_date)
+
+            start_date = medium_date
+
+
+if __name__ == "__main__":
      
     if True:
         DB = influx.InfluxDatabase()
