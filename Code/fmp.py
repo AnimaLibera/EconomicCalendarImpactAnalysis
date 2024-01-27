@@ -11,6 +11,7 @@ class FinancialModelingPrep:
 
     def __init__(self):
         self.environment()
+        self.database = influx.InfluxDatabase()
 
     def environment(self):
             """Load Environment from File"""
@@ -19,8 +20,11 @@ class FinancialModelingPrep:
     
     def economic_calendar(self, start_date, end_date):
         """Get Economic Calendar"""
-    
-        endpoint = f"https://financialmodelingprep.com/api/v3/economic_calendar?from={start_date}&to={end_date}&apikey={self.fmp_token}"    
+        
+        start_string = start_date.strftime("%Y-%m-%d")
+        stop_string = end_date.strftime("%Y-%m-%d")
+
+        endpoint = f"https://financialmodelingprep.com/api/v3/economic_calendar?from={start_string}&to={stop_string}&apikey={self.fmp_token}"    
         response = requests.get(endpoint)
         json_data = response.json()
         
@@ -56,6 +60,23 @@ class FinancialModelingPrep:
             return True
         else:
             return False
+        
+    def economic_calendar_pipeline(self, start_date, end_date):
+        """Pipeline to wrangle Economic Calendar from Soure to Sink
+            Source: financialmodelingprep.com
+            Sink:   Local influx Database"""
+        
+        print("Getting Economic Calendar")
+        json_data = self.economic_calendar(start_date, end_date)
+        
+        print("Parsing Economic Calendar")
+        data_frame = self.parse_economic_calendar_to_dataframe(json_data)
+        
+        print("Preprocessing Economic Calendar")
+        nice_df = self.preprocess_economic_calendar(data_frame)
+
+        print("Ingesting Economic Calendar")
+        self.database.ingest_events(nice_df)
 
 if __name__ == "__main__":
     

@@ -75,6 +75,8 @@ class Analyst:
         impact_frame["first impact"] = (impact_frame["price 5min"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
         impact_frame["second impact"] = (impact_frame["price 10min"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
         impact_frame["third impact"] = (impact_frame["price 30min"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
+        
+        impact_frame.drop(columns=["timestamp"], inplace=True)
 
         return impact_frame
 
@@ -141,17 +143,3 @@ class Analyst:
         elif old_price == 0:
             return old_price
         return (new_price - old_price) / old_price * 10000
-    
-
-if __name__ == "__main__":
-
-    start_date = "2024-01-01"
-    end_date = "2024-01-25"
-    analyst = Analyst(start_date, end_date)
-    frame = analyst.new_impact_analysis()
-    print(frame)
-    frame.to_html("../Report/ImpactAnalysis.html")
-    #group_frame = frame.groupby("event")["first impact"].count()
-    #print(group_frame)
-    grouped = frame.groupby("event")
-    print(grouped.get_group("PPI MoM"))
