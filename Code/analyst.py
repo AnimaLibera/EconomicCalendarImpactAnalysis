@@ -4,15 +4,15 @@ import pandas as pd
 
 class Analyst:
 
-    def __init__(self, start_date, end_date):
+    def __init__(self):
         self.provider = pv.Provider()
         self.influx = influx.InfluxDatabase()
         self.nice_economic_calendar = self.influx.preprocess_query_dataframe(self.influx.query_events(start = pd.Timestamp("2023-01-01T00:00"), stop = pd.Timestamp("2024-01-01T00:00")))
-        self.raw_economic_calendar = self.provider.economic_calendar(start_date, end_date)
-        self.raw_events = self.extract_events()
-        self.clean_high_impact_events = self.clean_events(self.extract_high_impact_events())
-        self.raw_countrys = self.extract_countrys()
-        self.unique_countrys = set(self.raw_countrys)
+        #self.raw_economic_calendar = self.provider.economic_calendar(start_date, end_date)
+        #self.raw_events = self.extract_events()
+        #self.clean_high_impact_events = self.clean_events(self.extract_high_impact_events())
+        #self.raw_countrys = self.extract_countrys()
+        #self.unique_countrys = set(self.raw_countrys)
         #self.fx_prices = self.provider.foreign_exchange_rates(start_date, end_date)
 
     def extract_events(self):

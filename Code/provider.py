@@ -48,7 +48,7 @@ class Provider:
         """Get Close for Minute-Bar"""
         
         #datetime = timestamp.strftime("%Y-%m-%d-%H:%M")
-        print(timestamp)
+        #print(timestamp)
         #data = self.foreign_exchange_rate_database(timestamp, pair)
         data = self.foreign_exchange_rate_influxdb(timestamp, pair)
 
