@@ -1,10 +1,13 @@
 import provider as pv
+import influx
 import pandas as pd
 
 class Analyst:
 
     def __init__(self, start_date, end_date):
         self.provider = pv.Provider()
+        self.influx = influx.InfluxDatabase()
+        self.nice_economic_calendar = self.influx.preprocess_query_dataframe(self.influx.query_events())
         self.raw_economic_calendar = self.provider.economic_calendar(start_date, end_date)
         self.raw_events = self.extract_events()
         self.clean_high_impact_events = self.clean_events(self.extract_high_impact_events())
@@ -55,6 +58,26 @@ class Analyst:
             countrys.append(element["country"])
         return countrys
     
+    def new_impact_analysis(self):
+        """Build Dataframe for Impact Analysis"""
+
+        impact_frame = self.nice_economic_calendar.sort_index(ascending=False)
+        impact_frame["timestamp"] = impact_frame.index
+        impact_frame["deviation"] = (impact_frame["actual"] - impact_frame["estimate"]) / impact_frame["estimate"]
+        impact_frame["price now open"] = impact_frame["timestamp"].apply(self.get_fx_price, args=("open",))
+        impact_frame["price now close"] = impact_frame["timestamp"].apply(self.get_fx_price, args=("close",))
+        impact_frame["price 5min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=5)).apply(self.get_fx_price, args=("close",))
+        impact_frame["price 10min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=10)).apply(self.get_fx_price, args=("close",))
+        impact_frame["price 30min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=30)).apply(self.get_fx_price, args=("close",))
+        
+        ###Calculate Impact in Basispoints###
+        impact_frame["original impact"] = (impact_frame["price now close"] - impact_frame["price now open"]) / impact_frame["price now open"] * 10000
+        impact_frame["first impact"] = (impact_frame["price 5min"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
+        impact_frame["second impact"] = (impact_frame["price 10min"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
+        impact_frame["third impact"] = (impact_frame["price 30min"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
+
+        return impact_frame
+
     def impact_analysis(self, country = "US", pair = "EURUSD"):
         """Build Dataframe for Impact Analysis"""
 
@@ -125,6 +148,6 @@ if __name__ == "__main__":
     start_date = "2024-01-01"
     end_date = "2024-01-25"
     analyst = Analyst(start_date, end_date)
-    frame = analyst.impact_analysis()
+    frame = analyst.new_impact_analysis()
     print(frame)
     frame.to_html("../Report/ImpactAnalysis.html")
