@@ -1,6 +1,7 @@
 import provider as pv
 import influx
 import pandas as pd
+import numpy as np
 
 class Analyst:
 
@@ -80,6 +81,14 @@ class Analyst:
 
         return impact_frame
 
+    def postprocess_impact_frame(self, impact_frame):
+        """Clean Impact Frame Infinite Values and NaN Values"""
+
+        impact_frame.replace([np.inf, - np.inf], np.nan, inplace = True)
+        impact_frame.dropna(inplace = True)
+
+        return impact_frame
+
     def impact_analysis(self, country = "US", pair = "EURUSD"):
         """Build Dataframe for Impact Analysis"""
 
@@ -143,3 +152,25 @@ class Analyst:
         elif old_price == 0:
             return old_price
         return (new_price - old_price) / old_price * 10000
+
+    def regression_analysis(self, model, x_series, y_series):
+        """Get Coefficient of Determination, Intercept and Slope of Regression Analysis"""
+
+        x_series = x_series.replace([np.inf, - np.inf], np.nan, inplace = False)
+        y_series = y_series.replace([np.inf, - np.inf], np.nan, inplace = False)
+        x_series.dropna(inplace = True)
+        y_series.dropna(inplace = True)
+
+        x = x_series.to_numpy()
+        y = y_series.to_numpy()
+        
+        x = x.reshape(-1, 1)
+        y = y.reshape(-1, 1)
+
+        model.fit(x, y)
+
+        cod = model.score(x, y)
+        intercept = model.intercept_
+        slope = model.coef_
+
+        return cod, intercept[0], slope[0][0]
