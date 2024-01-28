@@ -1,3 +1,4 @@
+from sklearn.linear_model import LinearRegression
 import provider as pv
 import influx
 import pandas as pd
@@ -174,3 +175,29 @@ class Analyst:
         slope = model.coef_
 
         return cod, intercept[0], slope[0][0]
+    
+    def make_regression_frame(self, impact_frame):
+        """Make Regression Frame from Impact Frame"""
+
+        unique_events = impact_frame["event"].unique()
+        groups = impact_frame.groupby("event")
+        model = LinearRegression()
+
+        records = []
+        names = []
+
+        for event in unique_events:
+            group = groups.get_group(event)
+            count = group.shape[0]
+            cod_original_impact = self.regression_analysis(model, group["deviation"], group["original impact"])[0]
+            cod_first_impact = self.regression_analysis(model, group["deviation"], group["first impact"])[0]
+            cod_second_impact = self.regression_analysis(model, group["deviation"], group["second impact"])[0]
+            cod_third_impact = self.regression_analysis(model, group["deviation"], group["third impact"])[0]
+
+            record = [count, cod_original_impact, cod_first_impact, cod_second_impact, cod_third_impact]
+            records.append(record)
+            names.append(event)
+
+        frame = pd.DataFrame(data = records, index=names, columns=["Count", "CoD Original Impact", "CoD First Impact", "CoD Second Impact", "CoD Third Impact"])
+
+        return frame
