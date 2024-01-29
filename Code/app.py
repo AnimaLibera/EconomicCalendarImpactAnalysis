@@ -2,5 +2,5 @@ import streamlit as st
 import os
 
 st.write("Impact Analysis!")
-#str.write("Secret Message:", os.environ['MESSAGE'], "via OS")
-str.write("Secret Message:", st.secrets['MESSAGE'], "via Streamlit")
+st.write("Secret Message:", os.environ['MESSAGE'], "via OS")
+st.write("Secret Message:", st.secrets['MESSAGE'], "via Streamlit")
