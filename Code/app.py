@@ -1,8 +1,8 @@
 import streamlit as st
 import os
 
-st.write("Impact Analysis!")
-st.write("Secret Message:", os.environ['MESSAGE'], "via OS")
-st.write("Secret Message:", st.secrets['MESSAGE'], "via Streamlit")
-st.write(f"Secret Message: {os.environ['MESSAGE']} via OS")
-st.write(f"Secret Message: {st.secrets['MESSAGE']} via Streamlit")
+titel = "Impact Analysis"
+description = "This is an work in progress project to analyze the impact of indicators of the economic calendar on currency-pair prices."
+
+st.write(titel)
+st.write(description)
