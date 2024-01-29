@@ -7,20 +7,27 @@ import os
 class InfluxDatabase:
     """Class to work with Influx-Database"""
 
-    def __init__(self):
+    def __init__(self, deployment="local"):
+        self.deplyoment = deployment
         self.environment()
-        self.influx_organisation = "NaturalPerson"
-        self.infux_bucket = "NewMarket"
-        self.influx_url = "http://localhost:8086"
         self.client = db.InfluxDBClient(url=self.influx_url, token=self.influx_token, org=self.influx_organisation, debug=False)
         #self.write_api = self.client.write_api(write_options=db.WriteOptions(batch_size=5_000, flush_interval=1_000))
         self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
         self.query_api = self.client.query_api()
     
     def environment(self):
-        """Load Environment from File"""
-        load_dotenv("../Secrets/Tokens.env")
-        self.influx_token = os.getenv("INFLUX")
+        """Load Environment from File or Secerets"""
+        if self.deplyoment == "local":
+            load_dotenv("../Secrets/Tokens.env")
+            self.influx_token = os.getenv("INFLUX_TOKEN")
+            self.influx_organisation = os.getenv("INFLUX_ORGANISATION")
+            self.infux_bucket = os.getenv("INFLUX_BUCKET")
+            self.influx_url = os.getenv("INFLUX_URL")
+        elif self.deplyoment == "streamlit":
+            self.influx_token = os.environ("INFLUX_TOKEN")
+            self.influx_organisation = os.environ("INFLUX_ORGANISATION")
+            self.infux_bucket = os.environ("INFLUX_BUCKET")
+            self.influx_url = os.environ("INFLUX_URL")
 
     def ingest_data(self, data_frame, measurement_name = "prices", tag_columns = ["symbol", "timeframe"]):
         """Ingest stepwise Data into InfluxDB"""
