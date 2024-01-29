@@ -29,7 +29,7 @@ class InfluxDatabase:
             self.infux_bucket = os.environ("INFLUX_BUCKET")
             self.influx_url = os.environ("INFLUX_URL")
 
-    def ingest_data(self, data_frame, measurement_name = "prices", tag_columns = ["symbol", "timeframe"]):
+    def ingest_data(self, data_frame, measurement_name = "prices", tag_columns = ["symbol", "timeframe", "source"]):
         """Ingest stepwise Data into InfluxDB"""
 
         row_numbers = data_frame.shape[0]
@@ -52,12 +52,12 @@ class InfluxDatabase:
             start += step
             counter += 1
 
-    def ingest_events(self, data_frame, measurement_name = "events", tag_columns = ["currency", "impact"]):
+    def ingest_events(self, data_frame, measurement_name = "events", tag_columns = ["currency", "impact", "source"]):
         """Call ingest_data with right Arguments to ingest Events into InfluxDB"""
 
         self.ingest_data(data_frame, measurement_name, tag_columns)
 
-    def query_data(self, time = pd.Timestamp("2024-01-25T13:30"), symbol = "EURUSD", timeframe = "1min"):
+    def query_data(self, time = pd.Timestamp("2024-01-25T13:30"), symbol = "EURUSD", timeframe = "1min", source="MetaTrader5"):
         """Query Pricedata from InfluxDB"""
 
         unix_start = int(time.timestamp())
@@ -69,12 +69,13 @@ class InfluxDatabase:
             |> filter(fn: (r) => r._measurement == "prices")
             |> filter(fn: (r) => r.symbol == "{symbol}")
             |> filter(fn: (r) => r.timeframe == "{timeframe}")
+            |> filter(fn: (r) => r.source == "{source}")
             |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
         """
 
         return self.query_api.query_data_frame(query)
 
-    def query_events(self, start = pd.Timestamp("2024-01-01T00:00"), stop = pd.Timestamp("2024-01-26T00:00"), currency = "USD", impact = "High"):
+    def query_events(self, start = pd.Timestamp("2024-01-01T00:00"), stop = pd.Timestamp("2024-01-26T00:00"), currency = "USD", impact = "High", source="FinancialModelingPrep"):
         """Query Events from InfluxDB"""
 
         unix_start = int(start.timestamp())
@@ -86,6 +87,7 @@ class InfluxDatabase:
             |> filter(fn: (r) => r._measurement == "events")
             |> filter(fn: (r) => r.currency == "{currency}")
             |> filter(fn: (r) => r.impact == "{impact}")
+            |> filter(fn: (r) => r.source == "{source}")
             |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
         """
 

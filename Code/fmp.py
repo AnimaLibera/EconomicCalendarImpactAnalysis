@@ -37,13 +37,14 @@ class FinancialModelingPrep:
 
         return data_frame
     
-    def preprocess_economic_calendar(self, data_frame):
+    def preprocess_economic_calendar(self, data_frame, source="FinancialModelingPrep"):
         """Preprocess Economic Calendar"""
 
         data_frame["timestamp"] = data_frame["date"].apply(lambda element: pd.Timestamp(element).tz_localize(tz="Etc/GMT"))
         data_frame.set_index("timestamp", inplace=True)
         data_frame.drop(columns=["date", "country", "previous", "change", "changePercentage"], inplace=True)
         data_frame["event"] = data_frame["event"].apply(self.clean_event)
+        data_frame["source"] = source
 
         return data_frame
     
@@ -91,12 +92,3 @@ class FinancialModelingPrep:
             self.economic_calendar_pipeline(start_date, medium_date)
 
             start_date = medium_date
-
-
-if __name__ == "__main__":
-     
-    if True:
-        DB = influx.InfluxDatabase()
-        data = DB.query_events(currency="JPY", impact="Medium")
-        nice_data = DB.preprocess_query_dataframe(data)
-        print(nice_data)
