@@ -11,8 +11,8 @@ class InfluxDatabase:
         self.deplyoment = deployment
         self.environment()
         self.client = db.InfluxDBClient(url=self.influx_url, token=self.influx_token, org=self.influx_organisation, debug=False)
-        #self.write_api = self.client.write_api(write_options=db.WriteOptions(batch_size=5_000, flush_interval=1_000))
-        self.write_api = self.client.write_api(write_options=SYNCHRONOUS)
+        self.write_api_batch = self.client.write_api(write_options=db.WriteOptions(batch_size=5_000, flush_interval=1_000))
+        self.write_api_synch = self.client.write_api(write_options=SYNCHRONOUS)
         self.query_api = self.client.query_api()
     
     def environment(self):
@@ -29,35 +29,44 @@ class InfluxDatabase:
             self.infux_bucket = os.environ("INFLUX_BUCKET")
             self.influx_url = os.environ("INFLUX_URL")
 
-    def ingest_data(self, data_frame, measurement_name = "prices", tag_columns = ["symbol", "timeframe", "source"]):
+    def ingest_data(self, data_frame, measurement_name = "prices", tag_columns = ["symbol", "timeframe", "source"], mode="live"):
         """Ingest stepwise Data into InfluxDB"""
+        
+        if mode == "test":
+            self.write_api_synch.write(self.infux_bucket, self.influx_organisation, record = data_frame.iloc[0:10], data_frame_measurement_name = measurement_name, data_frame_tag_columns = tag_columns)
+            return  
 
-        row_numbers = data_frame.shape[0]
-        step = 5000
-        start = 0
-        stop = 0
-        counter = 1
+        if mode == "batch":
+            self.write_api_batch.write(self.infux_bucket, self.influx_organisation, record = data_frame, data_frame_measurement_name = measurement_name, data_frame_tag_columns = tag_columns)
+            return
+        
+        if mode == "live":
+            row_numbers = data_frame.shape[0]
+            step = 5000
+            start = 0
+            stop = 0
+            counter = 1
 
-        while stop < row_numbers:
+            while stop < row_numbers:
 
-            stop += step
+                stop += step
 
-            if stop > row_numbers:
-                stop = row_numbers
+                if stop > row_numbers:
+                    stop = row_numbers
 
-            print(f"Counter: {counter}, Start at: {start}, Stop at: {stop}")
+                print(f"Counter: {counter}, Start at: {start}, Stop at: {stop}")
 
-            self.write_api.write(self.infux_bucket, self.influx_organisation, record = data_frame.iloc[start:stop], data_frame_measurement_name = measurement_name, data_frame_tag_columns = tag_columns)
+                self.write_api_synch.write(self.infux_bucket, self.influx_organisation, record = data_frame.iloc[start:stop], data_frame_measurement_name = measurement_name, data_frame_tag_columns = tag_columns)
 
-            start += step
-            counter += 1
+                start += step
+                counter += 1
 
     def ingest_events(self, data_frame, measurement_name = "events", tag_columns = ["currency", "impact", "source"]):
         """Call ingest_data with right Arguments to ingest Events into InfluxDB"""
 
         self.ingest_data(data_frame, measurement_name, tag_columns)
 
-    def query_data(self, time = pd.Timestamp("2024-01-25T13:30"), symbol = "EURUSD", timeframe = "1min", source="MetaTrader5"):
+    def query_data(self, time = pd.Timestamp("2024-01-25T13:30"), symbol = "EURUSD", timeframe = "1min", source = "MetaTrader5"):
         """Query Pricedata from InfluxDB"""
 
         unix_start = int(time.timestamp())
@@ -75,7 +84,7 @@ class InfluxDatabase:
 
         return self.query_api.query_data_frame(query)
 
-    def query_events(self, start = pd.Timestamp("2024-01-01T00:00"), stop = pd.Timestamp("2024-01-26T00:00"), currency = "USD", impact = "High", source="FinancialModelingPrep"):
+    def query_events(self, start = pd.Timestamp("2024-01-01T00:00"), stop = pd.Timestamp("2024-01-26T00:00"), currency = "USD", impact = "High", source = "FinancialModelingPrep"):
         """Query Events from InfluxDB"""
 
         unix_start = int(start.timestamp())
