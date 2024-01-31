@@ -6,16 +6,9 @@ import numpy as np
 
 class Analyst:
 
-    def __init__(self):
+    def __init__(self, deployment = "local"):
         self.provider = pv.Provider()
-        self.influx = influx.InfluxDatabase()
-        self.nice_economic_calendar = self.influx.preprocess_query_dataframe(self.influx.query_events(start = pd.Timestamp("2023-01-01T00:00"), stop = pd.Timestamp("2024-01-01T00:00")))
-        #self.raw_economic_calendar = self.provider.economic_calendar(start_date, end_date)
-        #self.raw_events = self.extract_events()
-        #self.clean_high_impact_events = self.clean_events(self.extract_high_impact_events())
-        #self.raw_countrys = self.extract_countrys()
-        #self.unique_countrys = set(self.raw_countrys)
-        #self.fx_prices = self.provider.foreign_exchange_rates(start_date, end_date)
+        self.influx = influx.InfluxDatabase(deployment = "streamlit")
 
     def extract_events(self):
         """Extract Economic Calendar Events"""
@@ -60,10 +53,13 @@ class Analyst:
             countrys.append(element["country"])
         return countrys
     
-    def new_impact_analysis(self):
+    def new_impact_analysis(self, start = pd.Timestamp("2023-01-01T00:00"), stop = pd.Timestamp("2024-01-01T00:00")):
         """Build Dataframe for Impact Analysis"""
 
-        impact_frame = self.nice_economic_calendar.sort_index(ascending=False)
+        raw_economic_calendar = self.influx.query_events(start = start, stop = stop)
+        nice_economic_calendar = self.influx.preprocess_query_dataframe(raw_economic_calendar)
+
+        impact_frame = nice_economic_calendar.sort_index(ascending=False)
         impact_frame["timestamp"] = impact_frame.index
         impact_frame["deviation"] = (impact_frame["actual"] - impact_frame["estimate"]) / impact_frame["estimate"]
         impact_frame["price now open"] = impact_frame["timestamp"].apply(self.get_fx_price, args=("open",))

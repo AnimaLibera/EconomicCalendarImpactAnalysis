@@ -1,14 +1,16 @@
-import influxdb_client as db
+#import influxdb_client as db
 from influxdb_client.client.write_api import SYNCHRONOUS
 from dotenv import load_dotenv
+import influxdb_client as db
 import pandas as pd
+import streamlit as st
 import os
 
 class InfluxDatabase:
     """Class to work with Influx-Database"""
 
-    def __init__(self, deployment="local"):
-        self.deplyoment = deployment
+    def __init__(self, deployment = "local"):
+        self.deployment = deployment
         self.environment()
         self.client = db.InfluxDBClient(url=self.influx_url, token=self.influx_token, org=self.influx_organisation, debug=False)
         self.write_api_batch = self.client.write_api(write_options=db.WriteOptions(batch_size=5_000, flush_interval=1_000))
@@ -17,17 +19,17 @@ class InfluxDatabase:
     
     def environment(self):
         """Load Environment from File or Secerets"""
-        if self.deplyoment == "local":
+        if self.deployment == "local":
             load_dotenv("../Secrets/Tokens.env")
             self.influx_token = os.getenv("INFLUX_TOKEN")
             self.influx_organisation = os.getenv("INFLUX_ORGANISATION")
             self.infux_bucket = os.getenv("INFLUX_BUCKET")
             self.influx_url = os.getenv("INFLUX_URL")
-        elif self.deplyoment == "streamlit":
-            self.influx_token = os.environ("INFLUX_TOKEN")
-            self.influx_organisation = os.environ("INFLUX_ORGANISATION")
-            self.infux_bucket = os.environ("INFLUX_BUCKET")
-            self.influx_url = os.environ("INFLUX_URL")
+        elif self.deployment == "streamlit":
+            self.influx_token = st.secrets["INFLUX_TOKEN"]
+            self.influx_organisation = st.secrets["INFLUX_ORGANISATION"]
+            self.infux_bucket = st.secrets["INFLUX_BUCKET"]
+            self.influx_url = st.secrets["INFLUX_URL"]
 
     def ingest_data(self, data_frame, measurement_name = "prices", tag_columns = ["symbol", "timeframe", "source"], mode="live"):
         """Ingest stepwise Data into InfluxDB"""
