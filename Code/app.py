@@ -1,5 +1,4 @@
 import streamlit as st
-import os
 import analyst as al
 import pandas as pd
 
