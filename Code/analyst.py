@@ -1,4 +1,4 @@
-from sklearn.linear_model import LinearRegression
+from sklearn import linear_model
 import provider as pv
 import influx
 import pandas as pd
@@ -177,7 +177,7 @@ class Analyst:
 
         unique_events = impact_frame["event"].unique()
         groups = impact_frame.groupby("event")
-        model = LinearRegression()
+        model = linear_model.LinearRegression()
 
         records = []
         names = []
