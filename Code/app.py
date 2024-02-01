@@ -19,10 +19,14 @@ def make_impact_analysis(_analyst):
     return _analyst.new_impact_analysis(start, stop)
 
 data_load_state = st.text('Loading data...')
-impact_frame = make_impact_analysis(_analyst = analyst)
+#impact_frame = make_impact_analysis(_analyst = analyst)
 data_load_state.text('Loading data...done!')
-st.write(impact_frame)
+#st.write(impact_frame)
 st.write("Fooder")
 
-#database = db.InfluxDatabase(deployment = "linode")
-#st.write(database)
+database = db.InfluxDatabase(deployment = "linode")
+st.write(database)
+start = pd.Timestamp("2023-12-15T00:00")
+stop = pd.Timestamp("2024-01-01T00:00")
+raw_economic_calendar = database.query_events(start = start, stop = stop)
+st.write(raw_economic_calendar)
