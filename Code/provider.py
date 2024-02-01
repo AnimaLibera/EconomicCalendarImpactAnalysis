@@ -62,8 +62,8 @@ class Provider:
     def foreign_exchange_rate_influxdb(self, timestamp, pair):
         """Get Foreign Exchange Rates from InfluxDB"""
 
-        query_data = database.query_data(timestamp, pair, "1min")
-        clean_data = database.preprocess_query_dataframe(query_data)
+        query_data = self.database.query_data(timestamp, pair, "1min")
+        clean_data = self.database.preprocess_query_dataframe(query_data)
 
         return clean_data
 

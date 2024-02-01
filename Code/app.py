@@ -1,6 +1,7 @@
 import streamlit as st
 import analyst as al
 import influx as db
+import provider as pv
 import pandas as pd
 
 
@@ -32,3 +33,7 @@ raw_economic_calendar = database.query_events(start = start, stop = stop)
 st.write(raw_economic_calendar)
 nice_economic_calendar = database.preprocess_query_dataframe(raw_economic_calendar)
 st.write(nice_economic_calendar)
+
+provider = pv.Provider(deployment = "linode")
+price = provider.foreign_exchange_rate_minute_close(start, "EURUSD")
+st.writen(price)
