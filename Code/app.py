@@ -25,7 +25,7 @@ st.write(impact_frame)
 
 st.write("<h3>Nice Economic Calendar</h3>")
 database = db.InfluxDatabase(deployment = "linode")
-currency_options = sorted("USD", "EUR", "GBP", "CAD", "JPY", "CHF", "AUD", "NZD")
+currency_options = ("USD", "EUR", "GBP", "CAD", "JPY", "CHF", "AUD", "NZD")
 selected_currency = st.selectbox("Currency:", currency_options)
 st.write("Selected Currency for Economic Calendar:", selected_currency)
 
