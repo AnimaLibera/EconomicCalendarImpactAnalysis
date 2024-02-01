@@ -28,7 +28,7 @@ currency_options = ("USD", "EUR", "GBP", "CAD", "JPY", "CHF", "AUD", "NZD")
 selected_currency = st.selectbox("Currency:", currency_options)
 impact_options = ("High", "Medium", "Low")
 selected_impact = st.selectbox("Impact:", impact_options)
-st.write("Selected Currency:", selected_currency, "Selected Impact:", selected_impact))
+st.write("Selected Currency:", selected_currency, "Selected Impact:", selected_impact)
 
 database = db.InfluxDatabase(deployment = "linode")
 start = pd.Timestamp("2023-12-15T00:00")
