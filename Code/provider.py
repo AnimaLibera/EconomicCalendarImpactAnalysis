@@ -8,8 +8,9 @@ import os
 
 class Provider:
 
-    def __init__(self):
+    def __init__(self, deployment = "local"):
           self.environment()
+          self.database = influx.InfluxDatabase(deployment = deployment)
 
     def environment(self):
             """Load Environment from File"""
@@ -61,7 +62,6 @@ class Provider:
     def foreign_exchange_rate_influxdb(self, timestamp, pair):
         """Get Foreign Exchange Rates from InfluxDB"""
 
-        database = influx.InfluxDatabase()
         query_data = database.query_data(timestamp, pair, "1min")
         clean_data = database.preprocess_query_dataframe(query_data)
 

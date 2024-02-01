@@ -7,7 +7,7 @@ import numpy as np
 class Analyst:
 
     def __init__(self, deployment = "local"):
-        self.provider = pv.Provider()
+        self.provider = pv.Provider(deployment = deployment)
         self.influx = influx.InfluxDatabase(deployment = deployment)
 
     def extract_events(self):
