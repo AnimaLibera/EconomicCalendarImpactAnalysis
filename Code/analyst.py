@@ -8,7 +8,7 @@ class Analyst:
 
     def __init__(self, deployment = "local"):
         self.provider = pv.Provider()
-        self.influx = influx.InfluxDatabase(deployment = "streamlit")
+        self.influx = influx.InfluxDatabase(deployment = deployment)
 
     def extract_events(self):
         """Extract Economic Calendar Events"""

@@ -9,7 +9,7 @@ description = "This is an work in progress project to analyze the impact of indi
 st.title(title)
 st.write(description)
 
-analyst = al.Analyst(deployment = "streamlit")
+analyst = al.Analyst(deployment = "linode")
 
 @st.cache_data
 def make_impact_analysis(_analyst):
