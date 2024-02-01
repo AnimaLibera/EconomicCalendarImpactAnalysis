@@ -27,6 +27,7 @@ database = db.InfluxDatabase(deployment = "linode")
 
 currency_options = ("EUR", "USD", "GBP", "CAD", "JPY", "CHF", "AUD", "NZD")
 selected_currency = st.selectbox("Currency:", currency_options)
+st.write(selected_currency)
 
 start = pd.Timestamp("2023-12-15T00:00")
 stop = pd.Timestamp("2024-01-01T00:00")
