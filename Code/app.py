@@ -36,4 +36,4 @@ st.write(nice_economic_calendar)
 
 provider = pv.Provider(deployment = "linode")
 price = provider.foreign_exchange_rate_minute_close(start, "EURUSD")
-st.writen(price)
+st.write(price)
