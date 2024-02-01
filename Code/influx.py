@@ -30,6 +30,11 @@ class InfluxDatabase:
             self.influx_organisation = st.secrets["INFLUX_ORGANISATION"]
             self.infux_bucket = st.secrets["INFLUX_BUCKET"]
             self.influx_url = st.secrets["INFLUX_URL"]
+        elif self.deployment == "linode":
+            self.influx_token = st.secrets["LINODE_INFLUX_TOKEN"]
+            self.influx_organisation = st.secrets["LINODE_INFLUX_ORGANISATION"]
+            self.infux_bucket = st.secrets["LINODE_INFLUX_BUCKET"]
+            self.influx_url = st.secrets["LINODE_INFLUX_URL"]
 
     def ingest_data(self, data_frame, measurement_name = "prices", tag_columns = ["symbol", "timeframe", "source"], mode="live"):
         """Ingest stepwise Data into InfluxDB"""

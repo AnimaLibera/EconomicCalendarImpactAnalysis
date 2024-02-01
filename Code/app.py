@@ -18,6 +18,6 @@ def make_impact_analysis(_analyst):
     return analyst.new_impact_analysis(start, stop)
 
 data_load_state = st.text('Loading data...')
-data = make_impact_analysis(_analyst = analyst)
+impact_frame = make_impact_analysis(_analyst = analyst)
 data_load_state.text('Loading data...done!')
-st.write(data)
+st.write(impact_frame)

@@ -9,9 +9,9 @@ import os
 class FinancialModelingPrep:
     """Financial Modeling Prep Dataprovider"""
 
-    def __init__(self):
+    def __init__(self, deployment = "local"):
         self.environment()
-        self.database = influx.InfluxDatabase()
+        self.database = influx.InfluxDatabase(deployment = deployment)
 
     def environment(self):
             """Load Environment from File"""
