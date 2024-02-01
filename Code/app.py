@@ -23,25 +23,16 @@ st.write("Impact Analysis")
 impact_frame = make_impact_analysis(_analyst = analyst)
 st.write(impact_frame)
 
+st.write("<h3>Nice Economic Calendar</h3>")
 database = db.InfluxDatabase(deployment = "linode")
-
-currency_options = ("EUR", "USD", "GBP", "CAD", "JPY", "CHF", "AUD", "NZD")
+currency_options = sorted("USD", "EUR", "GBP", "CAD", "JPY", "CHF", "AUD", "NZD")
 selected_currency = st.selectbox("Currency:", currency_options)
-st.write(selected_currency)
+st.write("Selected Currency for Economic Calendar:", selected_currency)
 
 start = pd.Timestamp("2023-12-15T00:00")
 stop = pd.Timestamp("2024-01-01T00:00")
 raw_economic_calendar = database.query_events(start = start, stop = stop, currency = selected_currency)
-st.write("Raw Economic Calendar")
-st.write(raw_economic_calendar)
 nice_economic_calendar = database.preprocess_query_dataframe(raw_economic_calendar)
-st.write("Nice Economic Calendar")
 st.write(nice_economic_calendar)
 
 st.write("Fooder")
-
-#2023.12.29	23:58:00 (GMT+2)
-#date = pd.Timestamp("2023-12-29T21:58")
-#provider = pv.Provider(deployment = "linode")
-#price = provider.foreign_exchange_rate_minute_close(date, "EURUSD")
-#st.write(price)
