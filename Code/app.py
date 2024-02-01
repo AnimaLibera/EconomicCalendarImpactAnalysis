@@ -20,9 +20,9 @@ def make_impact_analysis(_analyst):
     return _analyst.new_impact_analysis(start, stop)
 
 data_load_state = st.text('Loading data...')
-#impact_frame = make_impact_analysis(_analyst = analyst)
+impact_frame = make_impact_analysis(_analyst = analyst)
 data_load_state.text('Loading data...done!')
-#st.write(impact_frame)
+st.write(impact_frame)
 st.write("Fooder")
 
 database = db.InfluxDatabase(deployment = "linode")
