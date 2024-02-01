@@ -28,11 +28,11 @@ def make_economic_calendar(_database, currency = "USD", impact = "High"):
     nice_economic_calendar = _database.preprocess_query_dataframe(raw_economic_calendar)
     return nice_economic_calendar
 
-st.write("Impact Analysis")
+st.write("### Impact Analysis")
 impact_frame = make_impact_analysis(_analyst = analyst)
 st.write(impact_frame)
 
-st.write("Economic Calendar")
+st.write("### Economic Calendar")
 currency_options = ("USD", "EUR", "GBP", "CAD", "JPY", "CHF", "AUD", "NZD")
 selected_currency = st.selectbox("Currency:", currency_options)
 impact_options = ("High", "Medium", "Low")
