@@ -34,8 +34,8 @@ st.write(raw_economic_calendar)
 nice_economic_calendar = database.preprocess_query_dataframe(raw_economic_calendar)
 st.write(nice_economic_calendar)
 
-#2023.12.29	23:58:00
-date = pd.Timestamp("2023-12-29T23:58")
+#2023.12.29	23:58:00 (GMT+2)
+date = pd.Timestamp("2023-12-29T21:58")
 provider = pv.Provider(deployment = "linode")
 price = provider.foreign_exchange_rate_minute_close(date, "EURUSD")
 st.write(price)
