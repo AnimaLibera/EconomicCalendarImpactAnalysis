@@ -24,9 +24,13 @@ impact_frame = make_impact_analysis(_analyst = analyst)
 st.write(impact_frame)
 
 database = db.InfluxDatabase(deployment = "linode")
+
+currency_options = ("EUR", "USD", "GBP", "CAD", "JPY", "CHF", "AUD", "NZD")
+selected_currency = st.selectbox("Currency:", currency_options)
+
 start = pd.Timestamp("2023-12-15T00:00")
 stop = pd.Timestamp("2024-01-01T00:00")
-raw_economic_calendar = database.query_events(start = start, stop = stop)
+raw_economic_calendar = database.query_events(start = start, stop = stop, currency = selected_currency)
 st.write("Raw Economic Calendar")
 st.write(raw_economic_calendar)
 nice_economic_calendar = database.preprocess_query_dataframe(raw_economic_calendar)
