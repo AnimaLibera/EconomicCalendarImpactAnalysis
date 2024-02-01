@@ -1,6 +1,1 @@
-numpy
-pandas
-statsmodels
-scikit-learn
-Pillow
-streamlit
+scikit-learn==1.4.0
