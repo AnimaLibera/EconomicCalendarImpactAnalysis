@@ -10,20 +10,31 @@ class Analyst:
         self.provider = pv.Provider(deployment = deployment)
         self.influx = influx.InfluxDatabase(deployment = deployment)
     
-    def impact_analysis(self, start = pd.Timestamp("2023-01-01T00:00"), stop = pd.Timestamp("2024-01-01T00:00")):
+    def impact_analysis(self, start = pd.Timestamp("2023-01-01T00:00"), stop = pd.Timestamp("2024-01-01T00:00"), currency = "USD", impact = "High"):
         """Build Dataframe for Impact Analysis"""
 
-        raw_economic_calendar = self.influx.query_events(start = start, stop = stop)
+        raw_economic_calendar = self.influx.query_events(start = start, stop = stop, currency = currency, impact = impact)
         nice_economic_calendar = self.influx.preprocess_query_dataframe(raw_economic_calendar)
+
+        currency_pair_map = {   "USD": "EURUSD",
+                                "EUR": "EURUSD",
+                                "GBP": "GBPUSD",
+                                "NZD": "NZDUSD",
+                                "CAD": "USDCAD",
+                                "CHF": "USDCHF",
+                                "JPY": "USDJPY"}
+        
+        pair = currency_pair_map[currency]
 
         impact_frame = nice_economic_calendar.sort_index(ascending=False)
         impact_frame["timestamp"] = impact_frame.index
+        impact_frame["pair"] = pair
         impact_frame["deviation"] = (impact_frame["actual"] - impact_frame["estimate"]) / impact_frame["estimate"]
-        impact_frame["price now open"] = impact_frame["timestamp"].apply(self.get_fx_price, args=("open",))
-        impact_frame["price now close"] = impact_frame["timestamp"].apply(self.get_fx_price, args=("close",))
-        impact_frame["price 5min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=5)).apply(self.get_fx_price, args=("close",))
-        impact_frame["price 10min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=10)).apply(self.get_fx_price, args=("close",))
-        impact_frame["price 30min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=30)).apply(self.get_fx_price, args=("close",))
+        impact_frame["price now open"] = impact_frame["timestamp"].apply(self.get_fx_price, args=(pair, "open",))
+        impact_frame["price now close"] = impact_frame["timestamp"].apply(self.get_fx_price, args=(pair, "close",))
+        impact_frame["price 5min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=5)).apply(self.get_fx_price, args=(pair, "close",))
+        impact_frame["price 10min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=10)).apply(self.get_fx_price, args=(pair, "close",))
+        impact_frame["price 30min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=30)).apply(self.get_fx_price, args=(pair, "close",))
         
         ###Calculate Impact in Basispoints###
         impact_frame["original impact"] = (impact_frame["price now close"] - impact_frame["price now open"]) / impact_frame["price now open"] * 10000
@@ -43,10 +54,10 @@ class Analyst:
 
         return impact_frame
 
-    def get_fx_price(self, datetime, price = "close"):
+    def get_fx_price(self, datetime, pair = "EURUSD", price = "close"):
         """Get Foreign Exchange Price"""
 
-        return self.provider.foreign_exchange_rate_minute_close(datetime, pair = "EURUSD", price = price)
+        return self.provider.foreign_exchange_rate_minute_close(datetime, pair = pair, price = price)
 
     def regression_analysis(self, model, x_series, y_series):
         """Get Coefficient of Determination, Intercept and Slope of Regression Analysis"""
