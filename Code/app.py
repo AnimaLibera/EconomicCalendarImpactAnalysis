@@ -3,12 +3,6 @@ import analyst as al
 import influx as db
 import provider as pv
 import pandas as pd
-import sys
-
-if len(sys.argv) > 0:
-    deployment = sys.argv[1]
-else:
-    deployment = "linode"
 
 title = "Impact Analysis"
 description = "This is an work in progress project to analyze the impact of indicators of the economic calendar on currency-pair prices."
@@ -16,6 +10,7 @@ description = "This is an work in progress project to analyze the impact of indi
 st.title(title)
 st.write(description)
 
+deployment = st.secrets["DEPLOYMENT"]
 analyst = al.Analyst(deployment = deployment)
 database = db.InfluxDatabase(deployment = deployment)
 
