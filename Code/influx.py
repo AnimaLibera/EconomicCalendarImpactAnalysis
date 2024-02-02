@@ -16,6 +16,12 @@ class InfluxDatabase:
         self.write_api_batch = self.client.write_api(write_options=db.WriteOptions(batch_size=5_000, flush_interval=1_000))
         self.write_api_synch = self.client.write_api(write_options=SYNCHRONOUS)
         self.query_api = self.client.query_api()
+
+    def __del__(self):
+        self.write_api_batch.__del__()
+        self.write_api_synch.__del__()
+        self.query_api.__del__()
+        self.client.__del__()
     
     def environment(self):
         """Load Environment from File or Secerets"""
