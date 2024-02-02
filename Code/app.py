@@ -3,6 +3,7 @@ import analyst as al
 import influx as db
 import provider as pv
 import pandas as pd
+import datetime as dt
 
 title = "Impact Analysis"
 description = "This is an work in progress project to analyze the impact of indicators of the economic calendar on currency-pair prices."
@@ -33,10 +34,20 @@ impact_frame = make_impact_analysis(_analyst = analyst)
 st.write(impact_frame)
 
 st.write("### Economic Calendar")
+min_date = dt.date(2023, 1, 1)
+max_date = dt.date(2023, 12,31)
+start_date = st.date_input("Startdate", value = min_date, min_value = min_date, max_value = max_date)
+end_date = st.date_input("Enddate", value = max_date, min_value = min_date, max_value = max_date)
+
+if start_date > end_date:
+    st.write("Warning: Startdate is after Enddate")
+
 currency_options = ("USD", "EUR", "GBP", "CAD", "JPY", "CHF", "AUD", "NZD")
 selected_currency = st.selectbox("Currency:", currency_options)
+
 impact_options = ("High", "Medium", "Low")
 selected_impact = st.selectbox("Impact:", impact_options)
+
 st.write("Selected Currency:", selected_currency)
 st.write("Selected Impact:", selected_impact)
 economic_calendar = make_economic_calendar(_database = database, currency = selected_currency, impact = selected_impact)
