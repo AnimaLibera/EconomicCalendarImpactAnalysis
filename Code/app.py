@@ -5,7 +5,7 @@ import provider as pv
 import pandas as pd
 import sys
 
-if sys.argv != []:
+if len(sys.argv) > 0:
     deployment = sys.argv[1]
 else:
     deployment = "linode"
