@@ -42,7 +42,7 @@ class Analyst:
         impact_frame.dropna(inplace = True)
 
         return impact_frame
-    
+
     def get_fx_price(self, datetime, price = "close"):
         """Get Foreign Exchange Price"""
 
@@ -95,3 +95,9 @@ class Analyst:
         frame = pd.DataFrame(data = records, index=names, columns=["Count", "CoD Original Impact", "CoD First Impact", "CoD Second Impact", "CoD Third Impact"])
 
         return frame
+    
+    def economic_calendar(self, start, stop, currency = "USD", impact = "High"):
+        """Get Economic Calendar"""
+        raw_economic_calendar = self.influx.query_events(start = pd.Timestamp(start), stop = pd.Timestamp(stop), currency = currency, impact = impact)
+        nice_economic_calendar = self.influx.preprocess_query_dataframe(raw_economic_calendar)
+        return nice_economic_calendar

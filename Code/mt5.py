@@ -28,13 +28,3 @@ class MetaTrader5:
     def populate_csv_file(self, data, relativ_file_path = "../Data/", file_name = "market.csv"):
 
         data.to_csv(relativ_file_path + file_name, sep = "\t", index = True)
-
-if __name__ == "__main__":
-
-    mt5 = MetaTrader5()
-    print("Step #1")
-    raw_data = mt5.load_csv_to_dataframe()
-    print("Step #2")
-    clean_data = mt5.preprocess_csv_dataframe(raw_data)
-    print("Step #3")
-    mt5.populate_csv_file(clean_data)
