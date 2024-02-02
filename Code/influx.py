@@ -126,27 +126,3 @@ class InfluxDatabase:
         data_frame.set_index("timestamp", inplace = True)
 
         return data_frame
-
-
-if __name__ == "__main__":
-    
-    if False:
-        import mt5
-        print("Step #0")
-        metatrader = mt5.MetaTrader5()
-        print("Step #1")
-        raw_data = metatrader.load_csv_to_dataframe()
-        print("Step #2")
-        clean_data = metatrader.preprocess_csv_dataframe(raw_data)
-        print("Step #3")
-        database = InfluxDatabase()
-        print("Step #4")
-        database.ingest_data(clean_data)
-    
-    if True:
-        print("Query Data")
-        db = InfluxDatabase()
-        query_data = db.query_data()
-        print(query_data)
-        clean_data = db.preprocess_query_dataframe(query_data)
-        print(clean_data)

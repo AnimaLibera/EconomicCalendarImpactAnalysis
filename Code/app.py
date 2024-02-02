@@ -18,7 +18,7 @@ database = db.InfluxDatabase(deployment = deployment)
 def make_impact_analysis(_analyst):
     start = pd.Timestamp("2023-12-15T00:00")
     stop = pd.Timestamp("2024-01-01T00:00")
-    return _analyst.new_impact_analysis(start, stop)
+    return _analyst.impact_analysis(start, stop)
 
 @st.cache_data
 def make_economic_calendar(_database, currency = "USD", impact = "High"):
