@@ -50,5 +50,3 @@ st.write(economic_calendar)
 #st.write("### Impact Analysis")
 #impact_frame = make_impact_analysis(_analyst = analyst)
 #st.write(impact_frame)
-
-st.write("Fooder")

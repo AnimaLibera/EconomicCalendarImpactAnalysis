@@ -100,4 +100,11 @@ class Analyst:
         """Get Economic Calendar"""
         raw_economic_calendar = self.influx.query_events(start = pd.Timestamp(start), stop = pd.Timestamp(stop), currency = currency, impact = impact)
         nice_economic_calendar = self.influx.preprocess_query_dataframe(raw_economic_calendar)
-        return nice_economic_calendar
+        pretty_economic_calendar = self.pretty_economic_calendar(nice_economic_calendar)
+        return pretty_economic_calendar
+    
+    def pretty_economic_calendar(self, data_frame):
+        """Pretty up Economic Calendar for Presentation"""
+        data_frame.drop(columns=["currency", "impact", "source"], inplace=True)
+        data_frame.columns = data_frame.columns.str.capitalize()
+        return data_frame.loc[:,["Event", "Actual", "Estimate"]]
