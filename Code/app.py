@@ -22,10 +22,10 @@ def make_impact_analysis(_analyst):
     return _analyst.impact_analysis(start, stop)
 
 @st.cache_data
-def make_economic_calendar(_database, currency = "USD", impact = "High"):
-    start = pd.Timestamp("2023-12-15T00:00")
-    stop = pd.Timestamp("2024-01-01T00:00")
-    raw_economic_calendar = _database.query_events(start = start, stop = stop, currency = currency, impact = impact)
+def make_economic_calendar(_database, start, stop, currency = "USD", impact = "High"):
+    #start = pd.Timestamp("2023-12-15T00:00")
+    #stop = pd.Timestamp("2024-01-01T00:00")
+    raw_economic_calendar = _database.query_events(start = pd.Timestamp(start), stop = pd.Timestamp(stop), currency = currency, impact = impact)
     nice_economic_calendar = _database.preprocess_query_dataframe(raw_economic_calendar)
     return nice_economic_calendar
 
@@ -36,7 +36,8 @@ st.write(impact_frame)
 st.write("### Economic Calendar")
 min_date = dt.date(2023, 1, 1)
 max_date = dt.date(2023, 12,31)
-start_date = st.date_input("Startdate", value = min_date, min_value = min_date, max_value = max_date)
+start_value = dt.date(2023, 12, 1)
+start_date = st.date_input("Startdate", value = start_value, min_value = min_date, max_value = max_date)
 end_date = st.date_input("Enddate", value = max_date, min_value = min_date, max_value = max_date)
 
 if start_date > end_date:
@@ -50,7 +51,7 @@ selected_impact = st.selectbox("Impact:", impact_options)
 
 st.write("Selected Currency:", selected_currency)
 st.write("Selected Impact:", selected_impact)
-economic_calendar = make_economic_calendar(_database = database, currency = selected_currency, impact = selected_impact)
+economic_calendar = make_economic_calendar(_database = database, start = start_date, stop = end_date, currency = selected_currency, impact = selected_impact)
 st.write(economic_calendar)
 
 st.write("Fooder")
