@@ -10,9 +10,8 @@ analyst = al.Analyst(deployment = deployment)
 
 @st.cache_data
 def make_impact_analysis(_analyst, start, stop, currency = "USD", impact = "High"):
-    #start = pd.Timestamp("2023-12-15T00:00")
-    #stop = pd.Timestamp("2024-01-01T00:00")
-    return _analyst.impact_analysis(start = pd.Timestamp(start), stop = pd.Timestamp(stop), currency = currency, impact = impact)
+    impact_frame = _analyst.impact_analysis(start = pd.Timestamp(start), stop = pd.Timestamp(stop), currency = currency, impact = impact)
+    return _analyst.pretty_impact_analsysis(impact_frame)
 
 @st.cache_data
 def make_economic_calendar(_analyst, start, stop, currency = "USD", impact = "High"):
