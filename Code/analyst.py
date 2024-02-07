@@ -59,10 +59,11 @@ class Analyst:
 
         data_frame.drop(columns=["currency", "impact", "source", "pair"], inplace=True)
         data_frame.columns = data_frame.columns.str.capitalize()
-        return data_frame
-        #return data_frame.loc[:,["Event", "Actual", "Estimate", "Deviation", "Price now open", "Price now close", \
-        #                         "Price 5min", "Price 10min", "Price 30min", "Original impact", "First impact", \
-        #                         "Second impact", "Third impact"]]
+        well_orderd_columns = data_frame.columns.tolist()
+        well_orderd_columns.remove("Event")
+        well_orderd_columns.insert(0, "Event")
+
+        return data_frame.loc[:,well_orderd_columns]
 
     def get_fx_price(self, datetime, pair = "EURUSD", price = "close"):
         """Get Foreign Exchange Price"""
