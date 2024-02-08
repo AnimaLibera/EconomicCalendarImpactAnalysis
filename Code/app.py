@@ -17,6 +17,13 @@ def make_impact_analysis(_analyst, start, stop, currency = "USD", impact = "High
 def make_economic_calendar(_analyst, start, stop, currency = "USD", impact = "High"):
     return _analyst.economic_calendar(start = pd.Timestamp(start), stop = pd.Timestamp(stop), currency = currency, impact = impact)
 
+@st.cache_data
+def make_regression_frame(_analyst, start, stop, currency = "USD", impact = "High"):
+    raw_impact_frame = _analyst.impact_analysis(start = pd.Timestamp(start), stop = pd.Timestamp(stop), currency = currency, impact = impact)
+    clean_impact_frame = _analyst.postprocess_impact_frame(raw_impact_frame)
+    regression_frame = _analyst.make_regression_frame(clean_impact_frame)
+    return regression_frame
+
 title = "Impact Analysis"
 description = "This is an work in progress project to analyze the impact of indicators of the economic calendar on currency-pair prices."
 
@@ -49,3 +56,7 @@ st.write(economic_calendar)
 st.write("### Impact Analysis")
 impact_frame = make_impact_analysis(_analyst = analyst, start = start_date, stop = end_date, currency = selected_currency, impact = selected_impact)
 st.write(impact_frame)
+
+st.write("### Regression Analysis")
+regression_frame = make_regression_frame(_analyst = analyst, start = start_date, stop = end_date, currency = selected_currency, impact = selected_impact)
+st.write(regression_frame)

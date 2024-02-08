@@ -1,5 +1,6 @@
 from sklearn import linear_model
 import provider as pv
+import streamlit as st
 import influx
 import pandas as pd
 import numpy as np
@@ -22,7 +23,8 @@ class Analyst:
                                 "NZD": "NZDUSD",
                                 "CAD": "USDCAD",
                                 "CHF": "USDCHF",
-                                "JPY": "USDJPY"}
+                                "JPY": "USDJPY",
+                                "AUD": "AUDUSD"}
         
         pair = currency_pair_map[currency]
 
