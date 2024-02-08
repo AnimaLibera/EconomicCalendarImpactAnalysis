@@ -70,7 +70,7 @@ st.write(regression_frame)
 def make_heatmap(regression_frame):
     clean_regression_frame = regression_frame.drop(columns=["Count"])
     if clean_regression_frame.empty:
-        return None
+        return "Not enough Data for Heatmap"
     return px.imshow(clean_regression_frame, labels=dict(color="CoD"), aspect="auto", color_continuous_scale="rdylgn") 
 
 st.write("### Heatmap for Regression Analysis")
