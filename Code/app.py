@@ -66,6 +66,13 @@ st.write("Calculates the CoD for the Deviation and Impacts")
 regression_frame = make_regression_frame(_analyst = analyst, start = start_date, stop = end_date, currency = selected_currency, impact = selected_impact)
 st.write(regression_frame)
 
+@st.cache_data
+def make_heatmap(regression_frame):
+    clean_regression_frame = regression_frame.drop(columns=["Count"])
+    if clean_regression_frame.empty:
+        return None
+    return px.imshow(clean_regression_frame, labels=dict(color="CoD"), aspect="auto", color_continuous_scale="rdylgn") 
+
 st.write("### Heatmap for Regression Analysis")
-figure = px.imshow(regression_frame.drop(columns=["Count"]), labels=dict(color="CoD"), aspect="auto", color_continuous_scale="rdylgn")
+figure = make_heatmap(regression_frame)
 st.write(figure)
