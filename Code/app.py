@@ -1,3 +1,4 @@
+import plotly.express as px
 import streamlit as st
 import analyst as al
 import influx as db
@@ -22,7 +23,7 @@ def make_regression_frame(_analyst, start, stop, currency = "USD", impact = "Hig
     raw_impact_frame = _analyst.impact_analysis(start = pd.Timestamp(start), stop = pd.Timestamp(stop), currency = currency, impact = impact)
     clean_impact_frame = _analyst.postprocess_impact_frame(raw_impact_frame)
     regression_frame = _analyst.make_regression_frame(clean_impact_frame)
-    return regression_frame
+    return regression_frame[regression_frame["Count"] > 2]
 
 title = "Impact Analysis"
 description = "This is an work in progress project to analyze the impact of indicators of the economic calendar on currency-pair prices."
@@ -64,3 +65,7 @@ st.write("CoD - Coefficient of Determination")
 st.write("Calculates the CoD for the Deviation and Impacts")
 regression_frame = make_regression_frame(_analyst = analyst, start = start_date, stop = end_date, currency = selected_currency, impact = selected_impact)
 st.write(regression_frame)
+
+st.write("### Heatmap for Regression Analysis")
+figure = px.imshow(regression_frame.drop(columns=["Count"]), labels=dict(color="CoD"), aspect="auto", color_continuous_scale="rdylgn")
+st.write(figure)
