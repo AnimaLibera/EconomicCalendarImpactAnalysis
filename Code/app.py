@@ -50,13 +50,17 @@ st.write("Selected Currency:", selected_currency)
 st.write("Selected Impact:", selected_impact)
 
 st.write("### Economic Calendar")
+st.write("Shows the Economic Events for the selected Currency and Impact")
 economic_calendar = make_economic_calendar(_analyst = analyst, start = start_date, stop = end_date, currency = selected_currency, impact = selected_impact)
 st.write(economic_calendar)
 
 st.write("### Impact Analysis")
+st.write("Calculates the Deviation between the Estimate and Actual Values for the Economic Events and the Impact on the Currency-Pair-Prices.")
 impact_frame = make_impact_analysis(_analyst = analyst, start = start_date, stop = end_date, currency = selected_currency, impact = selected_impact)
 st.write(impact_frame)
 
 st.write("### Regression Analysis")
+st.write("CoD - Coefficient of Determination")
+st.write("Calculates the CoD for the Deviation and Impacts")
 regression_frame = make_regression_frame(_analyst = analyst, start = start_date, stop = end_date, currency = selected_currency, impact = selected_impact)
 st.write(regression_frame)
