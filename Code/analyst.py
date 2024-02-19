@@ -7,9 +7,10 @@ import numpy as np
 
 class Analyst:
 
-    def __init__(self, deployment = "local"):
+    def __init__(self, deployment = "local", source="MetaTrader5"):
         self.provider = pv.Provider(deployment = deployment)
         self.influx = influx.InfluxDatabase(deployment = deployment)
+        self.price_data_source = source
     
     def impact_analysis(self, start = pd.Timestamp("2023-01-01T00:00"), stop = pd.Timestamp("2024-01-01T00:00"), currency = "USD", impact = "High"):
         """Build Dataframe for Impact Analysis"""
@@ -32,11 +33,11 @@ class Analyst:
         impact_frame["timestamp"] = impact_frame.index
         impact_frame["pair"] = pair
         impact_frame["deviation"] = (impact_frame["actual"] - impact_frame["estimate"]) / impact_frame["estimate"]
-        impact_frame["price now open"] = impact_frame["timestamp"].apply(self.get_fx_price, args=(pair, "open",))
-        impact_frame["price now close"] = impact_frame["timestamp"].apply(self.get_fx_price, args=(pair, "close",))
-        impact_frame["price 5min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=5)).apply(self.get_fx_price, args=(pair, "close",))
-        impact_frame["price 10min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=10)).apply(self.get_fx_price, args=(pair, "close",))
-        impact_frame["price 30min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=30)).apply(self.get_fx_price, args=(pair, "close",))
+        impact_frame["price now open"] = impact_frame["timestamp"].apply(self.get_fx_price, args=(pair, "open", self.price_data_source))
+        impact_frame["price now close"] = impact_frame["timestamp"].apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
+        impact_frame["price 5min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=5)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
+        impact_frame["price 10min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=10)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
+        impact_frame["price 30min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=30)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
         
         ###Calculate Impact in Basispoints###
         impact_frame["original impact"] = (impact_frame["price now close"] - impact_frame["price now open"]) / impact_frame["price now open"] * 10000
