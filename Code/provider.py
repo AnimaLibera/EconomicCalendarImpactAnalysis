@@ -27,19 +27,19 @@ class Provider:
         
         return json_data
     
-    def foreign_exchange_rate_minute_close(self, timestamp, pair = "EURUSD", price = "close"):
-        """Get Close for Minute-Bar"""
+    def foreign_exchange_rate_minute(self, timestamp, pair = "EURUSD", price = "close", source = "MetaTrader5"):
+        """Get Price for Minute-Bar"""
         
-        data = self.foreign_exchange_rate_influxdb(timestamp, pair)
+        data = self.foreign_exchange_rate_influxdb(timestamp, pair, source)
 
         if type(data) == pd.core.frame.DataFrame and price in data and timestamp in data.index:
              return data.loc[timestamp][price]
         return None
 
-    def foreign_exchange_rate_influxdb(self, timestamp, pair):
+    def foreign_exchange_rate_influxdb(self, timestamp, pair, source):
         """Get Foreign Exchange Rates from InfluxDB"""
 
-        query_data = self.database.query_data(timestamp, pair, "1min")
+        query_data = self.database.query_data(timestamp, pair, "1min", source=source)
         clean_data = self.database.preprocess_query_dataframe(query_data)
 
         return clean_data

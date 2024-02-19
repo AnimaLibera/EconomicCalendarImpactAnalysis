@@ -67,10 +67,10 @@ class Analyst:
 
         return data_frame.loc[:,well_orderd_columns]
 
-    def get_fx_price(self, datetime, pair = "EURUSD", price = "close"):
+    def get_fx_price(self, datetime, pair = "EURUSD", price = "close", source="MetaTrader5"):
         """Get Foreign Exchange Price"""
 
-        return self.provider.foreign_exchange_rate_minute_close(datetime, pair = pair, price = price)
+        return self.provider.foreign_exchange_rate_minute(datetime, pair = pair, price = price, source=source)
 
     def regression_analysis(self, model, x_series, y_series):
         """Get Coefficient of Determination, Intercept and Slope of Regression Analysis"""
