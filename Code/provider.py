@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from datetime import datetime
+import streamlit as st
 import pandas as pd
 import requests
 import influx
@@ -9,14 +10,22 @@ import os
 class Provider:
 
     def __init__(self, deployment = "local"):
-          self.environment()
-          self.database = influx.InfluxDatabase(deployment = deployment)
+        self.deployment = deployment
+        self.environment()
+        self.database = influx.InfluxDatabase(deployment = deployment)
 
     def environment(self):
-            """Load Environment from File"""
+        """Load Environment from File or Secerets"""
+        if self.deployment == "local":
             load_dotenv("../Secrets/Tokens.env")
             self.fmp_token = os.getenv("FMP")
             self.tradermade_token = os.getenv("TRADERMADE")
+        elif self.deployment == "streamlit":
+            self.fmp_token = st.secrets["FMP"]
+            self.tradermade_token = st.secrets["TRADERMADE"]
+        elif self.deployment == "linode":
+            self.fmp_token = st.secrets["FMP"]
+            self.tradermade_token = st.secrets["TRADERMADE"]
 
     def economic_calendar(self, start_date, end_date):
         """Get Economic Calendar"""

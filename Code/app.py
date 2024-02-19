@@ -7,7 +7,7 @@ import pandas as pd
 import datetime as dt
 
 deployment = st.secrets["DEPLOYMENT"]
-analyst = al.Analyst(deployment = deployment, source="TradeMade")
+analyst = al.Analyst(deployment = deployment, source = "TradeMade")
 
 @st.cache_data
 def make_impact_analysis(_analyst, start, stop, currency = "USD", impact = "High"):
