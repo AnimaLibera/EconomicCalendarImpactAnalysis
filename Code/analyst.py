@@ -71,6 +71,7 @@ class Analyst:
     def get_fx_price(self, datetime, pair = "EURUSD", price = "close", source="MetaTrader5"):
         """Get Foreign Exchange Price"""
 
+        print(f"Get FX Price: Timestamp {datetime}, Pair {pair}, Price {price}, Source {source}")
         return self.provider.foreign_exchange_rate_minute(datetime, pair = pair, price = price, source=source)
 
     def regression_analysis(self, model, x_series, y_series):
