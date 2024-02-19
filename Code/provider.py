@@ -41,7 +41,6 @@ class Provider:
             if type(data) == pd.core.frame.DataFrame and price in data and timestamp in data.index:
                 return data.loc[timestamp][price]
             else:
-                print("Call TradeMade API")
                 try:
                     data = self.foreign_exchange_rate_trademade(timestamp, pair, price)
                     dictornary = {
@@ -54,7 +53,7 @@ class Provider:
                                 "close": data["close"],
                     }
                     dataframe = pd.DataFrame(dictornary, index=[timestamp])
-                    print(dataframe)
+                    self.database.ingest_data(dataframe)
                     return data[price]
                 except:
                     return None
