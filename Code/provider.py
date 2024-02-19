@@ -51,6 +51,7 @@ class Provider:
                 return data.loc[timestamp][price]
             else:
                 try:
+                    print("Try to call TradeMade API for Price Data")
                     data = self.foreign_exchange_rate_trademade(timestamp, pair, price)
                     dictornary = {
                                 "symbol": pair,
