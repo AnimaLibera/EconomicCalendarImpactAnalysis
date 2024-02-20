@@ -34,7 +34,7 @@ st.title(title)
 st.write(description)
 
 st.write("### Settings")
-source_options = ("Axiory.com", "ForexTester.com", "MetaTrader5", "TradeMade")
+source_options = ["Axiory.com", "ForexTester.com", "MetaTrader5", "TradeMade"]
 selected_source = st.selectbox("Data Source:", source_options)
 
 min_date = dt.date(2023, 1, 1)
