@@ -35,3 +35,31 @@ class ForexTester:
     def populate_csv_file(self, data, relativ_file_path = "../Data/", file_name = "market.csv"):
 
         data.to_csv(relativ_file_path + file_name, sep = ",", index = False)
+
+class Axiory:
+    """Axiory.com Dataprovider"""
+
+    def load_csv_to_dataframe(self, relativ_file_path = "../Data/Axiory/", file_name = "EURUSD_2023_all.csv"):
+        """Load CSV to DataFrame"""
+        
+        data = pd.read_csv(relativ_file_path + file_name, sep=",", index_col = None, parse_dates = False)
+        return data
+
+    def preprocess_csv_dataframe(self, data, symbol, timeframe = "1min", timezone = "Etc/GMT-2", source = "Axiory.com"):
+        """Preprocess CSV Dataframe: timezone is pytz Timezone"""
+
+        data.columns = ["date", "time", "open", "high", "low", "close", "volume"]
+
+        tz = pytz.timezone(timezone)
+        data["timestamp"] = (data["date"] + " " + data["time"]).apply(lambda string: datetime.strptime(string, "%Y.%m.%d %H:%M").replace(tzinfo=tz))
+        data["symbol"] = symbol
+        data["timeframe"] = timeframe
+        data["source"] = source
+        data.drop(columns = ["date", "time", "volume",], inplace = True)
+        data.set_index("timestamp", inplace = True)
+
+        return data
+
+    def populate_csv_file(self, data, relativ_file_path = "../Data/Axiory/", file_name = "market.csv"):
+
+        data.to_csv(relativ_file_path + file_name, sep = ",", index = False)

@@ -33,7 +33,8 @@ class Analyst:
         impact_frame["timestamp"] = impact_frame.index
         impact_frame["pair"] = pair
         impact_frame["deviation"] = (impact_frame["actual"] - impact_frame["estimate"]) / impact_frame["estimate"]
-        impact_frame["price now open"] = impact_frame["timestamp"].apply(self.get_fx_price, args=(pair, "open", self.price_data_source))
+        impact_frame["price now open"] = (impact_frame["timestamp"] - pd.Timedelta(minutes=1)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
+        #impact_frame["price now open"] = impact_frame["timestamp"].apply(self.get_fx_price, args=(pair, "open", self.price_data_source))
         impact_frame["price now close"] = impact_frame["timestamp"].apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
         impact_frame["price 5min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=5)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
         impact_frame["price 10min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=10)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
