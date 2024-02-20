@@ -8,12 +8,12 @@ class ForexTester:
     def load_csv_to_dataframe(self, relativ_file_path = "../Data/", file_name = "ForexTester.com EURUSD 1MIN GMT 2001-01-01 2024-01-31.txt"):
         """Load CSV to DataFrame"""
         
-        data = pd.read_csv(relativ_file_path + file_name, sep=",", index_col = None, parse_dates = False)
+        data = pd.read_csv(relativ_file_path + file_name, sep=",", index_col = None, parse_dates = False, dtype = {"<DTYYYYMMDD>": str, "<TIME>": str})
         return data
     
     def process_timeframe_csv_dataframe(self, data):
         """Process only Timeframe for raw CSV Dataframe"""
-        data["timestamp"] = (data["<DTYYYYMMDD>"].astype(str) + " " + data["<TIME>"].astype(str)).apply(lambda string: datetime.strptime(string, "%Y%m%d %H%M%S"))
+        data["timestamp"] = (data["<DTYYYYMMDD>"] + " " + data["<TIME>"]).apply(lambda string: datetime.strptime(string, "%Y%m%d %H%M%S"))
         data.set_index("timestamp", inplace = True)
 
         return data
@@ -22,11 +22,11 @@ class ForexTester:
         """Preprocess CSV Dataframe: timezone is pytz Timezone"""
 
         tz = pytz.timezone(timezone)
-        data["timestamp"] = (data["<DTYYYYMMDD>"].astype(str) + " " + data["<TIME>"].astype(str)).apply(lambda string: datetime.strptime(string, "%Y%m%d %H%M%S").replace(tzinfo=tz))
+        data["timestamp"] = (data["<DTYYYYMMDD>"] + " " + data["<TIME>"]).apply(lambda string: datetime.strptime(string, "%Y%m%d %H%M%S").replace(tzinfo=tz))
         data["symbol"] = symbol
         data["timeframe"] = timeframe
         data["source"] = source
-        data.drop(columns = ["<DTYYYYMMDD>", "<TIME>", "<VOL>",], inplace = True)
+        data.drop(columns = ["<TICKER>", "<DTYYYYMMDD>", "<TIME>", "<VOL>",], inplace = True)
         data.columns = ["open", "high", "low", "close", "timestamp", "symbol", "timeframe", "source"]
         data.set_index("timestamp", inplace = True)
 
