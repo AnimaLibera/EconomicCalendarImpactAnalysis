@@ -39,7 +39,7 @@ class Provider:
     def foreign_exchange_rate_minute(self, timestamp, pair = "EURUSD", price = "close", source = "MetaTrader5"):
         """Get Price for Minute-Bar"""
         
-        if source in ["MetaTrader4", "Axiory.com", "MetaTrader5", "ForexTester.com"]:
+        if source in ["Dukascopy", "MetaTrader4", "Axiory.com", "MetaTrader5", "ForexTester.com"]:
             data = self.foreign_exchange_rate_influxdb(timestamp, pair, source)
             print(f"Try to call InfluxDB for Price Data, Result {data}")
             if type(data) == pd.core.frame.DataFrame and price in data and timestamp in data.index:
