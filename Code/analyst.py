@@ -36,21 +36,21 @@ class Analyst:
         #impact_frame["price now open"] = (impact_frame["timestamp"] - pd.Timedelta(minutes=1)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
         impact_frame["price now open"] = impact_frame["timestamp"].apply(self.get_fx_price, args=(pair, "open", self.price_data_source))
         impact_frame["price now close"] = impact_frame["timestamp"].apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
-        impact_frame["price 5min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=5)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
-        impact_frame["price 10min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=10)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
-        impact_frame["price 30min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=30)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
-        impact_frame["price 1h"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=60)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
-        impact_frame["price 2h"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=120)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
-        impact_frame["price 3h"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=180)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
+        #impact_frame["price 5min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=5)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
+        #impact_frame["price 10min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=10)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
+        #impact_frame["price 30min"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=30)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
+        #impact_frame["price 1h"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=60)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
+        #impact_frame["price 2h"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=120)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
+        #impact_frame["price 3h"] = (impact_frame["timestamp"] + pd.Timedelta(minutes=180)).apply(self.get_fx_price, args=(pair, "close", self.price_data_source))
 
         ###Calculate Impact in Basispoints###
         impact_frame["original impact"] = (impact_frame["price now close"] - impact_frame["price now open"]) / impact_frame["price now open"] * 10000
-        impact_frame["first impact"] = (impact_frame["price 5min"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
-        impact_frame["second impact"] = (impact_frame["price 10min"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
-        impact_frame["third impact"] = (impact_frame["price 30min"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
-        impact_frame["one hour impact"] = (impact_frame["price 1h"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
-        impact_frame["tow hour impact"] = (impact_frame["price 2h"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
-        impact_frame["three hour impact"] = (impact_frame["price 3h"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
+        #impact_frame["first impact"] = (impact_frame["price 5min"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
+        #impact_frame["second impact"] = (impact_frame["price 10min"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
+        #impact_frame["third impact"] = (impact_frame["price 30min"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
+        #impact_frame["one hour impact"] = (impact_frame["price 1h"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
+        #impact_frame["tow hour impact"] = (impact_frame["price 2h"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
+        #impact_frame["three hour impact"] = (impact_frame["price 3h"] - impact_frame["price now close"]) / impact_frame["price now close"] * 10000
 
         impact_frame.drop(columns=["timestamp"], inplace=True)
 
@@ -143,4 +143,4 @@ class Analyst:
         """Pretty up Economic Calendar for Presentation"""
         data_frame.drop(columns=["currency", "impact", "source"], inplace=True)
         data_frame.columns = data_frame.columns.str.capitalize()
-        return data_frame.loc[:,["Event", "Actual", "Estimate"]]
+        return data_frame.loc[:,["Event", "Actual", "Estimate"]].sort_index(axis = 0)

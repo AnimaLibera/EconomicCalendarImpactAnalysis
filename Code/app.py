@@ -34,7 +34,7 @@ st.title(title)
 st.write(description)
 
 st.write("### Settings")
-source_options = ["Axiory.com", "ForexTester.com", "MetaTrader5", "TradeMade"]
+source_options = ["Axiory.com", "MetaTrader5", "MetaTrader4", "ForexTester.com", "TradeMade"]
 selected_source = st.selectbox("Data Source:", source_options)
 
 min_date = dt.date(2023, 1, 1)
@@ -69,8 +69,8 @@ st.write(impact_frame)
 st.write("### Regression Analysis")
 st.write("CoD - Coefficient of Determination")
 st.write("Calculates the CoD for the Deviation and Impacts")
-regression_frame = make_regression_frame(start = start_date, stop = end_date, deployment = deployment, source = selected_source, currency = selected_currency, impact = selected_impact)
-st.write(regression_frame)
+#regression_frame = make_regression_frame(start = start_date, stop = end_date, deployment = deployment, source = selected_source, currency = selected_currency, impact = selected_impact)
+#st.write(regression_frame)
 
 @st.cache_data
 def make_heatmap(regression_frame):
@@ -80,5 +80,5 @@ def make_heatmap(regression_frame):
     return px.imshow(clean_regression_frame, labels=dict(color="CoD"), aspect="auto", color_continuous_scale="rdylgn") 
 
 st.write("### Heatmap for Regression Analysis")
-figure = make_heatmap(regression_frame)
-st.write(figure)
+#figure = make_heatmap(regression_frame)
+#st.write(figure)
